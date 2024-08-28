@@ -1,36 +1,20 @@
 // Firebase and Firestore Initialization
 const firebaseConfig = {
-  apiKey: "AIzaSyD2SDMtKZmh72K2BbpA-hZK6X2NPE8d9AQ",
-  authDomain: "internexxus-products.firebaseapp.com",
-  projectId: "internexxus-products",
-  storageBucket: "internexxus-products.appspot.com",
-  messagingSenderId: "340039291602",
-  appId: "1:340039291602:web:0b0795bb9c6e8f6501930b",
-  measurementId: "G-BB654YGLR4"
-}
+    apiKey: "AIzaSyD2SDMtKZmh72K2BbpA-hZK6X2NPE8d9AQ",
+    authDomain: "internexxus-products.firebaseapp.com",
+    projectId: "internexxus-products",
+    storageBucket: "internexxus-products.appspot.com",
+    messagingSenderId: "340039291602",
+    appId: "1:340039291602:web:0b0795bb9c6e8f6501930b",
+    measurementId: "G-BB654YGLR4"
+};
 firebase.initializeApp(firebaseConfig);
+
 const db = firebase.firestore();
 const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
 
 // Google Auth Provider
 const provider = new firebase.auth.GoogleAuthProvider();
-
-// Handle Google Sign In
-function handleGoogleSignIn() {
-    return firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            const credential = result.credential;
-            const token = credential.accessToken;
-            // The signed-in user info.
-            const user = result.user;
-            return user;
-        }).catch((error) => {
-            // Handle Errors here.
-            console.error('Error during sign-in:', error);
-            throw error;
-        });
-}
 
 // Check if user is signed in and handle upload button
 document.getElementById('upload-button').addEventListener('click', () => {
@@ -40,9 +24,9 @@ document.getElementById('upload-button').addEventListener('click', () => {
         document.getElementById('resume-upload').click();
     } else {
         // If not signed in, trigger Google sign-in
-        handleGoogleSignIn()
+        firebase.auth().signInWithPopup(provider)
             .then(result => {
-                console.log('Signed in with Google:', result);
+                console.log('Signed in with Google:', result.user);
                 // After sign-in, trigger file input
                 document.getElementById('resume-upload').click();
             })
@@ -114,17 +98,23 @@ document.getElementById('generate-button').addEventListener('click', () => {
 
 // Authentication buttons for sign-in and sign-up
 document.querySelector('.sign-in').addEventListener('click', () => {
-    handleGoogleSignIn()
-        .then(user => {
-            console.log('Signed in with Google:', user);
+    firebase.auth().signInWithPopup(provider)
+        .then(result => {
+            console.log('Signed in with Google:', result.user);
+        })
+        .catch(error => {
+            console.error('Error during sign-in:', error);
         });
 });
 
 document.querySelector('.get-started').addEventListener('click', () => {
-    handleGoogleSignIn()
-        .then(user => {
-            console.log('Signed up with Google:', user);
-            saveUserData(user);
+    firebase.auth().signInWithPopup(provider)
+        .then(result => {
+            console.log('Signed up with Google:', result.user);
+            saveUserData(result.user);
+        })
+        .catch(error => {
+            console.error('Error during sign-up:', error);
         });
 });
 
