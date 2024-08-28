@@ -1,149 +1,105 @@
-// Firebase and Firestore Initialization
+// Your Firebase configuration (to be provided)
 const firebaseConfig = {
-    apiKey: "AIzaSyD2SDMtKZmh72K2BbpA-hZK6X2NPE8d9AQ",
-    authDomain: "internexxus-products.firebaseapp.com",
-    projectId: "internexxus-products",
-    storageBucket: "internexxus-products.appspot.com",
-    messagingSenderId: "340039291602",
-    appId: "1:340039291602:web:0b0795bb9c6e8f6501930b",
-    measurementId: "G-BB654YGLR4"
+  apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
+  authDomain: "internexxus-products-65a8b.firebaseapp.com",
+  projectId: "internexxus-products-65a8b",
+  storageBucket: "internexxus-products-65a8b.appspot.com",
+  messagingSenderId: "788630683314",
+  appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
+  measurementId: "G-B0JLMBTZWZ"
 };
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
+const auth = firebase.auth();
 const db = firebase.firestore();
-const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
+
+// DOM Elements
+const signInButton = document.getElementById('sign-in-button');
+const signOutButton = document.getElementById('sign-out-button');
+const uploadSection = document.getElementById('upload-section');
+const generateSection = document.getElementById('generate-section');
+const resultSection = document.getElementById('result-section');
+const uploadButton = document.getElementById('upload-button');
+const generateButton = document.getElementById('generate-button');
+const resumeUpload = document.getElementById('resume-upload');
+const jobDescription = document.getElementById('job-description');
+const coverLetterOutput = document.getElementById('cover-letter-output');
 
 // Google Auth Provider
 const provider = new firebase.auth.GoogleAuthProvider();
 
-// Check if user is signed in and handle upload button
-document.getElementById('upload-button').addEventListener('click', () => {
-    const user = firebase.auth().currentUser;
-    if (user) {
-        // If signed in, trigger file input
-        document.getElementById('resume-upload').click();
+// Sign in event
+signInButton.addEventListener('click', () => {
+    auth.signInWithPopup(provider)
+        .then(result => {
+            console.log('User signed in:', result.user);
+            toggleUI(true);
+        })
+        .catch(error => {
+            console.error('Sign in error:', error);
+        });
+});
+
+// Sign out event
+signOutButton.addEventListener('click', () => {
+    auth.signOut()
+        .then(() => {
+            console.log('User signed out');
+            toggleUI(false);
+        })
+        .catch(error => {
+            console.error('Sign out error:', error);
+        });
+});
+
+// Upload resume event
+uploadButton.addEventListener('click', () => {
+    const file = resumeUpload.files[0];
+    if (file) {
+        const storageRef = firebase.storage().ref();
+        const fileRef = storageRef.child(`resumes/${auth.currentUser.uid}/${file.name}`);
+        fileRef.put(file).then(() => {
+            console.log('File uploaded successfully');
+            generateSection.style.display = 'block';
+        }).catch(error => {
+            console.error('File upload error:', error);
+        });
     } else {
-        // If not signed in, trigger Google sign-in
-        firebase.auth().signInWithPopup(provider)
-            .then(result => {
-                console.log('Signed in with Google:', result.user);
-                // After sign-in, trigger file input
-                document.getElementById('resume-upload').click();
-            })
-            .catch(error => {
-                console.error('Error during sign-in:', error);
-            });
+        alert('Please select a file to upload.');
     }
 });
 
-// Handle file selection and upload
-document.getElementById('resume-upload').addEventListener('change', () => {
-    const fileInput = document.getElementById('resume-upload');
-    const formData = new FormData();
-    formData.append('resume', fileInput.files[0]);
-
-    fetch('https://your-api-endpoint/upload', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-        // Move to the next step
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
-        document.getElementById('job-description-box').style.display = 'block';
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+// Generate cover letter event
+generateButton.addEventListener('click', () => {
+    const description = jobDescription.value.trim();
+    if (description) {
+        // Placeholder: Simulate generating a cover letter
+        coverLetterOutput.innerText = `Generated cover letter for: ${description}`;
+        resultSection.style.display = 'block';
+    } else {
+        alert('Please enter a job description.');
+    }
 });
 
-// Handle job description and cover letter generation
-document.getElementById('generate-button').addEventListener('click', () => {
-    const jobDescription = document.getElementById('job-description').value;
-
-    fetch('https://your-api-endpoint/job-description', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ jobDescription: jobDescription }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-        // Move to the next step
-        document.getElementById('step2').classList.remove('active');
-        document.getElementById('step3').classList.add('active');
-
-        // Redirect to Stripe Checkout
-        return fetch('https://your-backend-endpoint/create-checkout-session', {
-            method: 'POST',
-        });
-    })
-    .then(response => response.json())
-    .then(session => {
-        return stripe.redirectToCheckout({ sessionId: session.id });
-    })
-    .then(result => {
-        if (result.error) {
-            console.error('Error:', result.error.message);
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+// Toggle UI based on user auth state
+auth.onAuthStateChanged(user => {
+    if (user) {
+        toggleUI(true);
+    } else {
+        toggleUI(false);
+    }
 });
 
-// Authentication buttons for sign-in and sign-up
-document.querySelector('.sign-in').addEventListener('click', () => {
-    firebase.auth().signInWithPopup(provider)
-        .then(result => {
-            console.log('Signed in with Google:', result.user);
-        })
-        .catch(error => {
-            console.error('Error during sign-in:', error);
-        });
-});
-
-document.querySelector('.get-started').addEventListener('click', () => {
-    firebase.auth().signInWithPopup(provider)
-        .then(result => {
-            console.log('Signed up with Google:', result.user);
-            saveUserData(result.user);
-        })
-        .catch(error => {
-            console.error('Error during sign-up:', error);
-        });
-});
-
-// Save user data to Firestore
-function saveUserData(user) {
-    db.collection('users').doc(user.uid).set({
-        email: user.email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        console.log('User data saved');
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+function toggleUI(isSignedIn) {
+    if (isSignedIn) {
+        signInButton.style.display = 'none';
+        signOutButton.style.display = 'block';
+        uploadSection.style.display = 'block';
+    } else {
+        signInButton.style.display = 'block';
+        signOutButton.style.display = 'none';
+        uploadSection.style.display = 'none';
+        generateSection.style.display = 'none';
+        resultSection.style.display = 'none';
+    }
 }
-
-// FAQ Toggle functionality
-document.querySelectorAll('.faq-question').forEach(item => {
-    item.addEventListener('click', () => {
-        const faqItem = item.parentElement;
-        const isVisible = faqItem.classList.contains('active');
-
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        if (!isVisible) {
-            faqItem.classList.add('active');
-        }
-    });
-});
