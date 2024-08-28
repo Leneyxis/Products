@@ -1,4 +1,4 @@
-// Firebase and Firestore Initialization (same as before)
+// Firebase and Firestore Initialization
 const firebaseConfig = {
     apiKey: "AIzaSyD2SDMtKZmh72K2BbpA-hZK6X2NPE8d9AQ",
     authDomain: "internexxus-products.firebaseapp.com",
