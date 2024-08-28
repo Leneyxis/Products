@@ -9,7 +9,21 @@ const firebaseConfig = {
     measurementId: "G-BB654YGLR4"
 };
 firebase.initializeApp(firebaseConfig);
-
+function handleGoogleSignIn() {
+    return firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = result.credential;
+            const token = credential.accessToken;
+            // The signed-in user info.
+            const user = result.user;
+            return user;
+        }).catch((error) => {
+            // Handle Errors here.
+            console.error('Error during sign-in:', error);
+            throw error;
+        });
+}
 const db = firebase.firestore();
 const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
 
