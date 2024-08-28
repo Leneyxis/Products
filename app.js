@@ -39,6 +39,9 @@ const coverLetterOutput = document.getElementById('cover-letter-output');
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
 
+// Variable to store the download URL
+let uploadedFileUrl = '';
+
 // Sign in event
 signInButton.addEventListener('click', () => {
     signInWithPopup(auth, provider)
@@ -68,12 +71,18 @@ uploadButton.addEventListener('click', () => {
     const file = resumeUpload.files[0];
     if (file) {
         const storageRef = ref(storage, `resumes/${auth.currentUser.uid}/${file.name}`);
-        uploadBytes(storageRef, file).then(() => {
-            console.log('File uploaded successfully');
-            generateSection.style.display = 'block';
-        }).catch(error => {
-            console.error('File upload error:', error);
-        });
+        uploadBytes(storageRef, file)
+            .then((snapshot) => {
+                console.log('File uploaded successfully');
+                return snapshot.ref.getDownloadURL(); // Get the download URL
+            })
+            .then((url) => {
+                uploadedFileUrl = url; // Store the download URL
+                generateSection.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('File upload error:', error);
+            });
     } else {
         alert('Please select a file to upload.');
     }
@@ -82,10 +91,10 @@ uploadButton.addEventListener('click', () => {
 // Generate cover letter event
 generateButton.addEventListener('click', () => {
     const description = jobDescription.value.trim();
-    if (description) {
+    if (description && uploadedFileUrl) {
         // Prepare the POST request payload
         const requestData = {
-            link: resumeUpload.files[0] ? `path/to/your/uploaded/file/${resumeUpload.files[0].name}` : '',
+            link: uploadedFileUrl, // Use the stored download URL
             job_description: description
         };
 
@@ -122,7 +131,7 @@ generateButton.addEventListener('click', () => {
             console.error('Error:', error);
         });
     } else {
-        alert('Please enter a job description.');
+        alert('Please upload a file and enter a job description.');
     }
 });
 
