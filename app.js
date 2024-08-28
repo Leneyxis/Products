@@ -1,4 +1,10 @@
-// Your Firebase configuration (to be provided)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+
+// Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
   authDomain: "internexxus-products-65a8b.firebaseapp.com",
@@ -8,10 +14,15 @@ const firebaseConfig = {
   appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
   measurementId: "G-B0JLMBTZWZ"
 };
+
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
+
+// Google Auth Provider
+const provider = new GoogleAuthProvider();
 
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
@@ -25,12 +36,9 @@ const resumeUpload = document.getElementById('resume-upload');
 const jobDescription = document.getElementById('job-description');
 const coverLetterOutput = document.getElementById('cover-letter-output');
 
-// Google Auth Provider
-const provider = new firebase.auth.GoogleAuthProvider();
-
 // Sign in event
 signInButton.addEventListener('click', () => {
-    auth.signInWithPopup(provider)
+    signInWithPopup(auth, provider)
         .then(result => {
             console.log('User signed in:', result.user);
             toggleUI(true);
@@ -42,7 +50,7 @@ signInButton.addEventListener('click', () => {
 
 // Sign out event
 signOutButton.addEventListener('click', () => {
-    auth.signOut()
+    signOut(auth)
         .then(() => {
             console.log('User signed out');
             toggleUI(false);
@@ -56,9 +64,8 @@ signOutButton.addEventListener('click', () => {
 uploadButton.addEventListener('click', () => {
     const file = resumeUpload.files[0];
     if (file) {
-        const storageRef = firebase.storage().ref();
-        const fileRef = storageRef.child(`resumes/${auth.currentUser.uid}/${file.name}`);
-        fileRef.put(file).then(() => {
+        const storageRef = ref(storage, `resumes/${auth.currentUser.uid}/${file.name}`);
+        uploadBytes(storageRef, file).then(() => {
             console.log('File uploaded successfully');
             generateSection.style.display = 'block';
         }).catch(error => {
@@ -82,7 +89,7 @@ generateButton.addEventListener('click', () => {
 });
 
 // Toggle UI based on user auth state
-auth.onAuthStateChanged(user => {
+onAuthStateChanged(auth, user => {
     if (user) {
         toggleUI(true);
     } else {
