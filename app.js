@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -74,7 +74,7 @@ uploadButton.addEventListener('click', () => {
         uploadBytes(storageRef, file)
             .then((snapshot) => {
                 console.log('File uploaded successfully');
-                return snapshot.ref.getDownloadURL(); // Get the download URL
+                return getDownloadURL(snapshot.ref); // Get the download URL
             })
             .then((url) => {
                 uploadedFileUrl = url; // Store the download URL
