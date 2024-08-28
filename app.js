@@ -9,6 +9,14 @@ const firebaseConfig = {
     measurementId: "G-BB654YGLR4"
 };
 firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
+
+// Google Auth Provider
+const provider = new firebase.auth.GoogleAuthProvider();
+
+// Handle Google Sign In
 function handleGoogleSignIn() {
     return firebase.auth().signInWithPopup(provider)
         .then((result) => {
@@ -24,11 +32,6 @@ function handleGoogleSignIn() {
             throw error;
         });
 }
-const db = firebase.firestore();
-const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
-
-// Google Auth Provider
-const provider = new firebase.auth.GoogleAuthProvider();
 
 // Check if user is signed in and handle upload button
 document.getElementById('upload-button').addEventListener('click', () => {
@@ -38,9 +41,9 @@ document.getElementById('upload-button').addEventListener('click', () => {
         document.getElementById('resume-upload').click();
     } else {
         // If not signed in, trigger Google sign-in
-        firebase.auth().signInWithPopup(provider)
+        handleGoogleSignIn()
             .then(result => {
-                console.log('Signed in with Google:', result.user);
+                console.log('Signed in with Google:', result);
                 // After sign-in, trigger file input
                 document.getElementById('resume-upload').click();
             })
