@@ -9,7 +9,6 @@ const firebaseConfig = {
     measurementId: "G-BB654YGLR4"
 };
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.firestore();
 const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
 
