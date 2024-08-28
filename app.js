@@ -36,6 +36,9 @@ const resumeUpload = document.getElementById('resume-upload');
 const jobDescription = document.getElementById('job-description');
 const coverLetterOutput = document.getElementById('cover-letter-output');
 
+// API URL
+const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
+
 // Sign in event
 signInButton.addEventListener('click', () => {
     signInWithPopup(auth, provider)
@@ -80,9 +83,44 @@ uploadButton.addEventListener('click', () => {
 generateButton.addEventListener('click', () => {
     const description = jobDescription.value.trim();
     if (description) {
-        // Placeholder: Simulate generating a cover letter
-        coverLetterOutput.innerText = `Generated cover letter for: ${description}`;
-        resultSection.style.display = 'block';
+        // Prepare the POST request payload
+        const requestData = {
+            link: resumeUpload.files[0] ? `path/to/your/uploaded/file/${resumeUpload.files[0].name}` : '',
+            job_description: description
+        };
+
+        // Send POST request to API
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // Parse the body to extract the URL
+            const body = JSON.parse(data.body);
+            const coverLetterUrl = body.cover_letter_url;
+
+            if (coverLetterUrl) {
+                // Trigger the download
+                const link = document.createElement('a');
+                link.href = coverLetterUrl;
+                link.download = coverLetterUrl.split('/').pop(); // Extract file name from URL
+                document.body.appendChild(link); // Append link to the body
+                link.click(); // Trigger click event
+                document.body.removeChild(link); // Remove link from the body
+                resultSection.style.display = 'block';
+            } else {
+                coverLetterOutput.innerText = 'Cover letter URL not available.';
+                resultSection.style.display = 'block';
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     } else {
         alert('Please enter a job description.');
     }
