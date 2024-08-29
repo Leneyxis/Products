@@ -133,6 +133,16 @@ nav ul li a {
     color: #333333;
 }
 
+.upload-box {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.upload-box.dragover {
+    border-color: #007bff;
+}
 .upload-section,
 .job-section,
 .results-section {
