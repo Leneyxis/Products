@@ -228,12 +228,36 @@ document.querySelectorAll('.faq-question').forEach(question => {
 });
 
 // Update Progress Bar
-function updateProgressBar(currentStep) {
-    document.querySelectorAll('.step').forEach((step, index) => {
-        if (index < currentStep) {
-            step.classList.add('active');
-        } else {
-            step.classList.remove('active');
+document.addEventListener('DOMContentLoaded', () => {
+    const steps = document.querySelectorAll('.step');
+    const uploadButton = document.querySelector('.upload-button');
+    const jobDescriptionInput = document.querySelector('#job-description-input');
+    const generateButton = document.querySelector('.generate-button');
+
+    let currentStep = 0;
+
+    function updateProgressBar(stepIndex) {
+        steps.forEach((step, index) => {
+            if (index <= stepIndex) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+            }
+        });
+    }
+
+    uploadButton.addEventListener('click', () => {
+        currentStep = 1; // Move to step 1 (upload job description)
+        updateProgressBar(currentStep);
+    });
+
+    generateButton.addEventListener('click', () => {
+        if (jobDescriptionInput.value.trim() !== '') {
+            currentStep = 2; // Move to step 2 (generate results)
+            updateProgressBar(currentStep);
         }
     });
-}
+
+    // Optional: Handle any other events that should update the progress bar
+});
+
