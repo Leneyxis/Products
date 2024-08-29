@@ -290,3 +290,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Optional: Handle any other events that should update the progress bar
 });
 
+// Sign out event
+signOutButton.addEventListener('click', () => {
+    signOut(auth)
+        .then(() => {
+            console.log('User signed out');
+            toggleUI(false);
+            // Refresh the page after signing out
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Sign out error:', error);
+        });
+});
+
