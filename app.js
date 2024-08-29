@@ -18,7 +18,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
 const storage = getStorage(app);
 
 // Google Auth Provider
@@ -27,21 +26,11 @@ const provider = new GoogleAuthProvider();
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
-const uploadSection = document.getElementById('upload-section');
-const generateSection = document.getElementById('generate-section');
-const resultSection = document.getElementById('result-section');
 const uploadBox = document.getElementById('upload-box');  // Drag and drop area
 const uploadButton = document.getElementById('upload-button');
-const generateButton = document.getElementById('generate-button');
 const resumeUpload = document.getElementById('resume-upload');
-const jobDescription = document.getElementById('job-description');
-const coverLetterOutput = document.getElementById('cover-letter-output');
-
-// DOM Elements for Modal and Loader
-const textDialog = document.getElementById('text-dialog');
-const closeDialog = document.getElementById('close-dialog');
-const dialogSubmit = document.getElementById('dialog-submit');
-const dialogJobDescription = document.getElementById('dialog-job-description');
+const jobDescriptionInput = document.getElementById('job-description');
+const generateButton = document.getElementById('generate-button');
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -164,7 +153,6 @@ function showJobDescriptionInput() {
     });
 }
 
-
 // Generate Cover Letter
 function generateCoverLetter(description) {
     // Prepare the POST request payload
@@ -217,10 +205,35 @@ function toggleUI(isSignedIn) {
     if (isSignedIn) {
         signInButton.style.display = 'none';
         signOutButton.style.display = 'block';
-        uploadSection.style.display = 'block';
+        uploadBox.style.display = 'block'; // Assuming this is the intended behavior
     } else {
         signInButton.style.display = 'block';
         signOutButton.style.display = 'none';
-        uploadSection.style.display = 'none';
+        uploadBox.style.display = 'none';
     }
+}
+
+// FAQ Toggle
+document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const isVisible = answer.style.display === 'block';
+        
+        // Hide all answers
+        document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+        
+        // Toggle current answer
+        answer.style.display = isVisible ? 'none' : 'block';
+    });
+});
+
+// Update Progress Bar
+function updateProgressBar(currentStep) {
+    document.querySelectorAll('.step').forEach((step, index) => {
+        if (index < currentStep) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
 }
