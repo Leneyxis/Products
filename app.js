@@ -130,77 +130,80 @@ function handleFileUpload(file) {
         })
         .then((url) => {
             uploadedFileUrl = url; // Store the download URL
-            loader.style.display = 'none'; // Hide loader after upload
-            textDialog.style.display = 'block'; // Show dialog for job description input
+            showJobDescriptionInput(); // Show job description input
         })
         .catch(error => {
             console.error('File upload error:', error);
-            loader.style.display = 'none'; // Hide loader if upload fails
         });
 }
 
-// Close dialog
-closeDialog.addEventListener('click', () => {
-    textDialog.style.display = 'none';
-});
+// Show Job Description Input
+function showJobDescriptionInput() {
+    // Clear the upload box content
+    uploadBox.innerHTML = '';
 
-// Submit job description from dialog
-dialogSubmit.addEventListener('click', () => {
-    jobDescription.value = dialogJobDescription.value.trim(); // Transfer to the main textarea
-    textDialog.style.display = 'none'; // Hide dialog
-    generateSection.style.display = 'block'; // Show the generate section
-});
+    // Create and append the text area for job description
+    const jobDescriptionInput = document.createElement('textarea');
+    jobDescriptionInput.id = 'job-description-input';
+    jobDescriptionInput.placeholder = 'Enter the job description here...';
+    jobDescriptionInput.rows = 10;
+    jobDescriptionInput.cols = 50;
+    uploadBox.appendChild(jobDescriptionInput);
 
-// Generate cover letter event
-generateButton.addEventListener('click', () => {
-    const description = jobDescription.value.trim();
-    if (description && uploadedFileUrl) {
-        loader.style.display = 'block'; // Show loader during processing
+    // Set up the "Generate Cover Letter" button
+    generateButton.textContent = 'Generate Cover Letter';
+    generateButton.className = 'generate-button'; // Optional: add class for styling
+    uploadBox.appendChild(generateButton);
 
-        const requestData = {
-            link: uploadedFileUrl,
-            job_description: description
-        };
+    // Handle the click event for generating the cover letter
+    generateButton.addEventListener('click', () => {
+        const description = jobDescriptionInput.value.trim();
+        if (description && uploadedFileUrl) {
+            generateCoverLetter(description);
+        } else {
+            alert('Please enter a job description.');
+        }
+    });
+}
 
-        // Send POST request to API
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            loader.style.display = 'none'; // Hide loader after processing
+// Generate Cover Letter
+function generateCoverLetter(description) {
+    // Prepare the POST request payload
+    const requestData = {
+        link: uploadedFileUrl, // Use the stored download URL
+        job_description: description
+    };
 
-            // Parse the body to extract the URL
-            const body = JSON.parse(data.body);
-            const coverLetterUrl = body.cover_letter_url;
+    // Send POST request to API
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        const body = JSON.parse(data.body);
+        const coverLetterUrl = body.cover_letter_url;
 
-            if (coverLetterUrl) {
-                // Trigger the download
-                const link = document.createElement('a');
-                link.href = coverLetterUrl;
-                link.download = coverLetterUrl.split('/').pop(); // Extract file name from URL
-                document.body.appendChild(link); // Append link to the body
-                link.click(); // Trigger click event
-                document.body.removeChild(link); // Remove link from the body
-                resultSection.style.display = 'block';
-            } else {
-                coverLetterOutput.innerText = 'Cover letter URL not available.';
-                resultSection.style.display = 'block';
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            loader.style.display = 'none'; // Hide loader if there's an error
-        });
-    } else {
-        alert('Please upload a file and enter a job description.');
-    }
-});
+        if (coverLetterUrl) {
+            // Trigger the download
+            const link = document.createElement('a');
+            link.href = coverLetterUrl;
+            link.download = coverLetterUrl.split('/').pop(); // Extract file name from URL
+            document.body.appendChild(link); // Append link to the body
+            link.click(); // Trigger click event
+            document.body.removeChild(link); // Remove link from the body
+        } else {
+            alert('Cover letter URL not available.');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
 
 // Toggle UI based on user auth state
 onAuthStateChanged(auth, user => {
@@ -220,7 +223,5 @@ function toggleUI(isSignedIn) {
         signInButton.style.display = 'block';
         signOutButton.style.display = 'none';
         uploadSection.style.display = 'none';
-        generateSection.style.display = 'none';
-        resultSection.style.display = 'none';
     }
 }
