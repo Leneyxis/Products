@@ -1,7 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
@@ -174,8 +173,8 @@ function generateCoverLetter(description) {
     .then(response => response.json())
     .then(data => {
         console.log('Success:', data);
-        const body = JSON.parse(data.body);
-        const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145'; // Replace with the correct payment URL
+        // Use the fixed Stripe payment URL
+        const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145';
 
         if (stripePaymentUrl) {
             // Redirect to Stripe payment
@@ -288,13 +287,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Optional: Handle any other events that should update the progress bar
-});
-
-// Sign out event listener
-document.querySelector('#sign-out-button').addEventListener('click', () => {
-    signOut(auth).then(() => {
-        console.log('User signed out');
-    }).catch((error) => {
-        console.error('Sign out error:', error);
-    });
 });
