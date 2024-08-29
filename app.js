@@ -1,137 +1,185 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-
-// Your Firebase configuration
+// Firebase and Firestore Initialization
 const firebaseConfig = {
-  apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
-  authDomain: "internexxus-products-65a8b.firebaseapp.com",
-  projectId: "internexxus-products-65a8b",
-  storageBucket: "internexxus-products-65a8b.appspot.com",
-  messagingSenderId: "788630683314",
-  appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
-  measurementId: "G-B0JLMBTZWZ"
+    apiKey: "AIzaSyD2SDMtKZmh72K2BbpA-hZK6X2NPE8d9AQ",
+    authDomain: "internexxus-products.firebaseapp.com",
+    projectId: "internexxus-products",
+    storageBucket: "internexxus-products.appspot.com",
+    messagingSenderId: "340039291602",
+    appId: "1:340039291602:web:0b0795bb9c6e8f6501930b",
+    measurementId: "G-BB654YGLR4"
 };
+firebase.initializeApp(firebaseConfig);
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const stripe = Stripe('YOUR_PUBLISHABLE_KEY'); // Stripe initialization
+const db = firebase.firestore();
+const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
 
 // Google Auth Provider
-const provider = new GoogleAuthProvider();
+const provider = new firebase.auth.GoogleAuthProvider();
 
-// DOM Elements
-const signInButton = document.getElementById('sign-in-button');
-const signOutButton = document.getElementById('sign-out-button');
-const uploadSection = document.getElementById('step1');
-const generateSection = document.getElementById('step2');
-const resultSection = document.getElementById('step3');
+// Elements
+const uploadBox = document.getElementById('upload-box');
+const resumeUpload = document.getElementById('resume-upload');
 const uploadButton = document.getElementById('upload-button');
 const generateButton = document.getElementById('generate-button');
-const resumeUpload = document.getElementById('resume-upload');
-const jobDescription = document.getElementById('job-description');
-const coverLetterOutput = document.getElementById('cover-letter-output');
+const generateSection = document.getElementById('step2');
+let uploadedFileUrl = ''; // To store uploaded file URL for further use
 
-// API URL
-const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
-
-// Variable to store the download URL
-let uploadedFileUrl = '';
-
-// Sign in event
-signInButton.addEventListener('click', () => {
-    signInWithPopup(auth, provider)
-        .then(result => {
-            console.log('User signed in:', result.user);
-            toggleUI(true);
-        })
-        .catch(error => {
-            console.error('Sign in error:', error);
-        });
+// Drag and Drop handling
+uploadBox.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadBox.classList.add('dragover'); // Visual cue for drag-over state
 });
 
-// Sign out event
-signOutButton.addEventListener('click', () => {
-    signOut(auth)
-        .then(() => {
-            console.log('User signed out');
-            toggleUI(false);
-        })
-        .catch(error => {
-            console.error('Sign out error:', error);
-        });
+uploadBox.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadBox.classList.remove('dragover'); // Remove visual cue
 });
 
-// Upload resume event
+uploadBox.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    uploadBox.classList.remove('dragover');
+
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+        resumeUpload.files = e.dataTransfer.files; // Assign dropped file to input element
+        handleFileUpload(file); // Handle file upload
+    } else {
+        alert('Please upload a PDF file.');
+    }
+});
+
+// Click-to-Select File
 uploadButton.addEventListener('click', () => {
-    const file = resumeUpload.files[0];
-    if (file) {
-        const storageRef = ref(storage, `resumes/${auth.currentUser.uid}/${file.name}`);
-        uploadBytes(storageRef, file)
-            .then((snapshot) => {
-                console.log('File uploaded successfully');
-                return getDownloadURL(snapshot.ref); // Get the download URL
-            })
-            .then((url) => {
-                uploadedFileUrl = url; // Store the download URL
-                generateSection.classList.add('active');
-                document.getElementById('job-description-box').style.display = 'block';
-            })
-            .catch(error => {
-                console.error('File upload error:', error);
-            });
+    resumeUpload.click(); // Trigger hidden file input
+});
+
+resumeUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+        handleFileUpload(file); // Handle file upload
     } else {
-        alert('Please select a file to upload.');
+        alert('Please select a PDF file.');
     }
 });
 
-// Generate cover letter event
-generateButton.addEventListener('click', () => {
-    const description = jobDescription.value.trim();
-    if (description && uploadedFileUrl) {
-        const requestData = {
-            link: uploadedFileUrl,
-            job_description: description
-        };
-
-        fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestData),
+// Handle File Upload
+function handleFileUpload(file) {
+    const user = firebase.auth().currentUser;
+    if (!user) {
+        alert('Please sign in first.');
+        return;
+    }
+    const storageRef = firebase.storage().ref(`resumes/${user.uid}/${file.name}`);
+    storageRef.put(file)
+        .then((snapshot) => {
+            console.log('File uploaded successfully');
+            return snapshot.ref.getDownloadURL();
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Cover letter generated:', data.cover_letter);
-            coverLetterOutput.value = data.cover_letter; // Set the generated cover letter
-            resultSection.classList.add('active');
+        .then((url) => {
+            uploadedFileUrl = url;
+            console.log('File available at:', url);
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('job-description-box').style.display = 'block';
         })
         .catch(error => {
-            console.error('Error generating cover letter:', error);
+            console.error('File upload error:', error);
         });
-    } else {
-        alert('Please provide a job description and upload your resume first.');
-    }
-});
-
-// Toggle UI for authentication state
-function toggleUI(isLoggedIn) {
-    signInButton.style.display = isLoggedIn ? 'none' : 'block';
-    signOutButton.style.display = isLoggedIn ? 'block' : 'none';
-    uploadSection.style.display = isLoggedIn ? 'block' : 'none';
 }
 
-// Firebase authentication state observer
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        console.log('User is signed in:', user);
-        toggleUI(true);
-    } else {
-        console.log('No user is signed in.');
-        toggleUI(false);
+// Handle Job Description and Cover Letter Generation
+generateButton.addEventListener('click', () => {
+    const jobDescription = document.getElementById('job-description').value;
+    if (!uploadedFileUrl) {
+        alert('Please upload a resume first.');
+        return;
     }
+    fetch('https://your-api-endpoint/job-description', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ jobDescription: jobDescription, resumeUrl: uploadedFileUrl }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+
+        // Redirect to Stripe Checkout
+        return fetch('https://your-backend-endpoint/create-checkout-session', {
+            method: 'POST',
+        });
+    })
+    .then(response => response.json())
+    .then(session => {
+        return stripe.redirectToCheckout({ sessionId: session.id });
+    })
+    .then(result => {
+        if (result.error) {
+            console.error('Error:', result.error.message);
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+
+// Authentication buttons for sign-in and sign-up
+document.querySelector('.sign-in').addEventListener('click', () => {
+    handleGoogleSignIn()
+        .then(user => {
+            console.log('Signed in with Google:', user);
+        });
+});
+
+document.querySelector('.get-started').addEventListener('click', () => {
+    handleGoogleSignIn()
+        .then(user => {
+            console.log('Signed up with Google:', user);
+            saveUserData(user);
+        });
+});
+
+// Google Sign-In Handler
+function handleGoogleSignIn() {
+    return firebase.auth().signInWithPopup(provider)
+        .then(result => result.user)
+        .catch(error => {
+            console.error('Error during sign-in:', error);
+        });
+}
+
+// Save User Data to Firestore
+function saveUserData(user) {
+    db.collection('users').doc(user.uid).set({
+        email: user.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        console.log('User data saved');
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
+
+// FAQ Toggle functionality
+document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', () => {
+        const faqItem = item.parentElement;
+        const isVisible = faqItem.classList.contains('active');
+
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        if (!isVisible) {
+            faqItem.classList.add('active');
+        }
+    });
 });
