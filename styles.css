@@ -236,11 +236,23 @@ nav ul li a {
     cursor: pointer;
 }
 
-.upload-box,
 #job-description-input {
     width: 100%;
-    max-width: 600px; /* Adjust width as needed */
-    height: 200px;    /* Ensure both have the same height */
+    max-width: 600px; /* Ensure it's the same width as the upload box */
+    height: 200px;
+    padding: 20px;
+    border: 1px solid #ccc; /* Change the border to solid */
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    resize: none; /* Disable resizing */
+    outline: none; /* Remove outline on focus */
+}
+
+.upload-box {
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
     padding: 20px;
     border: 2px dashed #ccc;
     border-radius: 8px;
@@ -248,6 +260,12 @@ nav ul li a {
     margin-bottom: 20px;
     box-sizing: border-box;
 }
+
+/* Remove the dashed border when showing the job description box */
+.job-description-active .upload-box {
+    border: none; /* Remove border */
+}
+
 
 .generate-button {
     background-color: #007bff;
