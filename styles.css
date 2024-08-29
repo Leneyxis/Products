@@ -66,7 +66,7 @@ nav ul li a {
     align-items: center;
     padding: 60px 20px;
     background-image: url('backdrop.jpg');
-    object-fit:contain;
+    object-fit: contain;
 }
 
 .hero-content {
@@ -134,15 +134,21 @@ nav ul li a {
 }
 
 .upload-box {
-    border: 2px dashed #ccc;
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
     padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
     text-align: center;
-    transition: border-color 0.3s ease;
+    margin-bottom: 20px;
+    box-sizing: border-box;
 }
 
 .upload-box.dragover {
     border-color: #007bff;
 }
+
 .upload-section,
 .job-section,
 .results-section {
@@ -159,12 +165,6 @@ nav ul li a {
     margin-bottom: 20px;
 }
 
-.upload-box {
-    border: 2px dashed rgb(0, 0, 0);
-    padding: 40px;
-    text-align: center;
-}
-
 .upload-box p {
     margin: 0 0 20px;
 }
@@ -176,6 +176,33 @@ nav ul li a {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#job-description-input {
+    width: 100%;
+    max-width: 600px; /* Ensure it's the same width as the upload box */
+    height: 200px;
+    padding: 20px;
+    border: 1px solid #ccc; /* Change the border to solid */
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    resize: none; /* Disable resizing */
+    outline: none; /* Remove outline on focus */
+}
+
+.generate-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.generate-button:hover {
+    background-color: #0056b3;
 }
 
 /* Modal Dialog */
@@ -236,56 +263,15 @@ nav ul li a {
     cursor: pointer;
 }
 
-#job-description-input {
-    width: 100%;
-    max-width: 600px; /* Ensure it's the same width as the upload box */
-    height: 200px;
-    padding: 20px;
-    border: 1px solid #ccc; /* Change the border to solid */
-    border-radius: 8px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
-    resize: none; /* Disable resizing */
-    outline: none; /* Remove outline on focus */
-}
-
-.upload-box {
-    width: 100%;
-    max-width: 600px;
-    height: 200px;
-    padding: 20px;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-}
-
 /* Remove the dashed border when showing the job description box */
 .job-description-active .upload-box {
     border: none; /* Remove border */
-}
-
-
-.generate-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.generate-button:hover {
-    background-color: #0056b3;
 }
 
 .how-it-works, .why-use {
     padding: 60px 20px;
     text-align: center;
     background-image: ur;
-    
 }
 
 .how-it-works h2, .why-use h2 {
@@ -411,7 +397,7 @@ nav ul li a {
 footer {
     padding: 20px 0;
     text-align: center;
-  }
+}
 
 @media (max-width: 768px) {
     .hero-content {
