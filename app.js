@@ -43,7 +43,6 @@ const closeDialog = document.getElementById('close-dialog');
 const dialogSubmit = document.getElementById('dialog-submit');
 const dialogJobDescription = document.getElementById('dialog-job-description');
 
-
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
 
@@ -142,15 +141,14 @@ function showJobDescriptionInput() {
     // Create and append the text area for job description
     const jobDescriptionInput = document.createElement('textarea');
     jobDescriptionInput.id = 'job-description-input';
+    jobDescriptionInput.className = 'upload-box';  // Use the same class as the upload box for consistent styling
     jobDescriptionInput.placeholder = 'Enter the job description here...';
-    jobDescriptionInput.rows = 10;
-    jobDescriptionInput.cols = 50;
     uploadBox.appendChild(jobDescriptionInput);
 
     // Set up the "Generate Cover Letter" button
-    const generateButton = document.createElement('button'); // Ensure the button is created
+    const generateButton = document.createElement('button');
     generateButton.textContent = 'Generate Cover Letter';
-    generateButton.className = 'generate-button'; // Optional: add class for styling
+    generateButton.className = 'generate-button';
     uploadBox.appendChild(generateButton);
 
     // Handle the click event for generating the cover letter
