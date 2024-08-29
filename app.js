@@ -151,6 +151,7 @@ function showJobDescriptionInput() {
     uploadBox.appendChild(jobDescriptionInput);
 
     // Set up the "Generate Cover Letter" button
+    const generateButton = document.createElement('button'); // Ensure the button is created
     generateButton.textContent = 'Generate Cover Letter';
     generateButton.className = 'generate-button'; // Optional: add class for styling
     uploadBox.appendChild(generateButton);
