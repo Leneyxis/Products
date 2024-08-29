@@ -6,7 +6,13 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
 
 // Your Firebase configuration
 const firebaseConfig = {
-  // Your Firebase config
+  apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
+  authDomain: "internexxus-products-65a8b.firebaseapp.com",
+  projectId: "internexxus-products-65a8b",
+  storageBucket: "internexxus-products-65a8b.appspot.com",
+  messagingSenderId: "788630683314",
+  appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
+  measurementId: "G-B0JLMBTZWZ"
 };
 
 // Initialize Firebase
