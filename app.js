@@ -2,25 +2,27 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-// Firebase and Firestore Initialization
+// Your Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyD2SDMtKZmh72K2BbpA-hZK6X2NPE8d9AQ",
-    authDomain: "internexxus-products.firebaseapp.com",
-    projectId: "internexxus-products",
-    storageBucket: "internexxus-products.appspot.com",
-    messagingSenderId: "340039291602",
-    appId: "1:340039291602:web:0b0795bb9c6e8f6501930b",
-    measurementId: "G-BB654YGLR4"
+  apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
+  authDomain: "internexxus-products-65a8b.firebaseapp.com",
+  projectId: "internexxus-products-65a8b",
+  storageBucket: "internexxus-products-65a8b.appspot.com",
+  messagingSenderId: "788630683314",
+  appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
+  measurementId: "G-B0JLMBTZWZ"
 };
-firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
-const stripe = Stripe('YOUR_PUBLISHABLE_KEY');
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Google Auth Provider
-const provider = new firebase.auth.GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 
 // Elements
 const uploadBox = document.getElementById('upload-box');
