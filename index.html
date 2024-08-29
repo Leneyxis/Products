@@ -3,42 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cover Letter Generator</title>
+    <title>Internexxus Cover Letter Generator</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <h1>Cover Letter Generator</h1>
-        <div id="auth-buttons">
-            <button id="sign-in-button">Sign in with Google</button>
-            <button id="sign-out-button" style="display:none;">Sign out</button>
+        <div class="container">
+            <div class="logo">
+                <a href="https://internexxus.com">
+                    <img width="220" height="42" src="logo.jpg" alt="Logo">
+                </a>
+            </div>
+            <div class="auth-buttons">
+                <button class="sign-in" id="sign-in-button">Sign in with Google</button>
+                <button class="get-started" id="sign-out-button" style="display: none;">Sign out</button>
+            </div>
         </div>
     </header>
-
     <main>
-        <section id="upload-section" style="display:none;">
-            <h2>Step 1: Upload Your Resume</h2>
-            <input type="file" id="resume-upload" />
-            <button id="upload-button">Upload Resume</button>
+        <section class="hero">
+            <div class="hero-content">
+                <img src="cover-letter.jpg" alt="Cover Letter Image">
+                <div class="hero-text">
+                    <h1>Create a professional cover letter in minutes.</h1>
+                    <p>Our AI-powered cover letter generator helps you craft personalized cover letters to make a great first impression.</p>
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="step active" id="step1">
+                            <div class="circle">1</div>
+                            <div class="label">Upload Resume</div>
+                        </div>
+                        <div class="step" id="step2">
+                            <div class="circle">2</div>
+                            <div class="label">Add Job Description</div>
+                        </div>
+                        <div class="step" id="step3">
+                            <div class="circle">3</div>
+                            <div class="label">Generate Cover Letter</div>
+                        </div>
+                    </div>
+                    <div class="upload-box">
+                        <p>Drag or Click to Select</p>
+                        <input type="file" id="resume-upload" style="display: none;">
+                        <button class="upload-button" id="upload-button">Upload</button>
+                    </div>
+                    <div class="job-description-box" id="job-description-box" style="display:none;">
+                        <textarea id="job-description" placeholder="Paste job description here"></textarea>
+                        <button class="generate-button" id="generate-button">Generate</button>
+                    </div>
+                </div>
+            </div>
         </section>
-
-        <section id="generate-section" style="display:none;">
-            <h2>Step 2: Add Job Description</h2>
-            <textarea id="job-description" placeholder="Paste job description here"></textarea>
-            <button id="generate-button">Generate Cover Letter</button>
-        </section>
-
-        <section id="result-section" style="display:none;">
-            <h2>Your Cover Letter</h2>
-            <p id="cover-letter-output"></p>
-        </section>
+        <!-- Keep the rest of the HTML as is for other sections like "How it works", "Why use", FAQ, etc. -->
+        <footer>
+            <p>© Internexxus</p>
+        </footer>    
     </main>
 
-    <!-- Firebase SDKs (Removed as ES Modules are used) -->
-    <!-- Stripe.js -->
+    <!-- Firebase SDKs and Stripe.js -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js"></script>
     <script src="https://js.stripe.com/v3/"></script>
 
-    <!-- Your Custom Script -->
+    <!-- Merged Custom Script -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
