@@ -42,7 +42,7 @@ const textDialog = document.getElementById('text-dialog');
 const closeDialog = document.getElementById('close-dialog');
 const dialogSubmit = document.getElementById('dialog-submit');
 const dialogJobDescription = document.getElementById('dialog-job-description');
-const loader = document.getElementById('loader');
+
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -118,9 +118,6 @@ function handleFileUpload(file) {
         alert('Please sign in first.');
         return;
     }
-
-    // Show loader during upload
-    loader.style.display = 'block';
 
     const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
     uploadBytes(storageRef, file)
