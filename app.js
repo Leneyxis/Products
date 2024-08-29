@@ -37,6 +37,13 @@ const resumeUpload = document.getElementById('resume-upload');
 const jobDescription = document.getElementById('job-description');
 const coverLetterOutput = document.getElementById('cover-letter-output');
 
+// DOM Elements for Modal and Loader
+const textDialog = document.getElementById('text-dialog');
+const closeDialog = document.getElementById('close-dialog');
+const dialogSubmit = document.getElementById('dialog-submit');
+const dialogJobDescription = document.getElementById('dialog-job-description');
+const loader = document.getElementById('loader');
+
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
 
@@ -111,7 +118,10 @@ function handleFileUpload(file) {
         alert('Please sign in first.');
         return;
     }
-    
+
+    // Show loader during upload
+    loader.style.display = 'block';
+
     const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
     uploadBytes(storageRef, file)
         .then((snapshot) => {
@@ -120,20 +130,35 @@ function handleFileUpload(file) {
         })
         .then((url) => {
             uploadedFileUrl = url; // Store the download URL
-            generateSection.style.display = 'block';
+            loader.style.display = 'none'; // Hide loader after upload
+            textDialog.style.display = 'block'; // Show dialog for job description input
         })
         .catch(error => {
             console.error('File upload error:', error);
+            loader.style.display = 'none'; // Hide loader if upload fails
         });
 }
+
+// Close dialog
+closeDialog.addEventListener('click', () => {
+    textDialog.style.display = 'none';
+});
+
+// Submit job description from dialog
+dialogSubmit.addEventListener('click', () => {
+    jobDescription.value = dialogJobDescription.value.trim(); // Transfer to the main textarea
+    textDialog.style.display = 'none'; // Hide dialog
+    generateSection.style.display = 'block'; // Show the generate section
+});
 
 // Generate cover letter event
 generateButton.addEventListener('click', () => {
     const description = jobDescription.value.trim();
     if (description && uploadedFileUrl) {
-        // Prepare the POST request payload
+        loader.style.display = 'block'; // Show loader during processing
+
         const requestData = {
-            link: uploadedFileUrl, // Use the stored download URL
+            link: uploadedFileUrl,
             job_description: description
         };
 
@@ -148,6 +173,8 @@ generateButton.addEventListener('click', () => {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
+            loader.style.display = 'none'; // Hide loader after processing
+
             // Parse the body to extract the URL
             const body = JSON.parse(data.body);
             const coverLetterUrl = body.cover_letter_url;
@@ -168,6 +195,7 @@ generateButton.addEventListener('click', () => {
         })
         .catch((error) => {
             console.error('Error:', error);
+            loader.style.display = 'none'; // Hide loader if there's an error
         });
     } else {
         alert('Please upload a file and enter a job description.');
