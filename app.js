@@ -138,10 +138,12 @@ function showJobDescriptionInput() {
     // Clear the upload box content
     uploadBox.innerHTML = '';
 
+    // Add the class to remove dashed border
+    uploadBox.classList.add('job-description-active');
+
     // Create and append the text area for job description
     const jobDescriptionInput = document.createElement('textarea');
     jobDescriptionInput.id = 'job-description-input';
-    jobDescriptionInput.className = 'upload-box';  // Use the same class as the upload box for consistent styling
     jobDescriptionInput.placeholder = 'Enter the job description here...';
     uploadBox.appendChild(jobDescriptionInput);
 
@@ -161,6 +163,7 @@ function showJobDescriptionInput() {
         }
     });
 }
+
 
 // Generate Cover Letter
 function generateCoverLetter(description) {
