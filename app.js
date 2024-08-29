@@ -29,8 +29,6 @@ const signOutButton = document.getElementById('sign-out-button');
 const uploadBox = document.getElementById('upload-box');
 const uploadButton = document.getElementById('upload-button');
 const resumeUpload = document.getElementById('resume-upload');
-const jobDescriptionInput = document.getElementById('job-description');
-const generateButton = document.getElementById('generate-button');
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -157,12 +155,7 @@ function hideLoader() {
     document.getElementById('loader').style.display = 'none';
 }
 
-// Function to redirect to Stripe payment
-function redirectToStripePayment(stripeUrl) {
-    window.location.href = stripeUrl;
-}
-
-// Generate Cover Letter
+// Generate Cover Letter and Redirect to Payment
 function generateCoverLetter(description) {
     showLoader();
 
@@ -182,8 +175,7 @@ function generateCoverLetter(description) {
     .then(data => {
         console.log('Success:', data);
         const body = JSON.parse(data.body);
-        const coverLetterUrl = body.cover_letter_url;
-        const stripePaymentUrl = body.stripe_payment_url; // Assuming the API returns a Stripe payment URL
+        const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145'; // Replace with the correct payment URL
 
         if (stripePaymentUrl) {
             // Redirect to Stripe payment
@@ -198,6 +190,11 @@ function generateCoverLetter(description) {
     .finally(() => {
         hideLoader();
     });
+}
+
+// Function to redirect to Stripe payment
+function redirectToStripePayment(stripeUrl) {
+    window.location.href = stripeUrl;
 }
 
 // Handle successful payment and download
@@ -218,6 +215,11 @@ function handleSuccessfulPayment() {
         document.body.removeChild(link);
     }
 }
+
+// Check for successful payment on page load
+document.addEventListener('DOMContentLoaded', () => {
+    handleSuccessfulPayment();
+});
 
 // Toggle UI based on user auth state
 onAuthStateChanged(auth, user => {
@@ -288,17 +290,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Optional: Handle any other events that should update the progress bar
 });
 
-// Sign out event
-signOutButton.addEventListener('click', async () => {
-    try {
-        await signOut(auth);
+// Sign out event listener
+document.querySelector('#sign-out-button').addEventListener('click', () => {
+    signOut(auth).then(() => {
         console.log('User signed out');
-        toggleUI(false);
-        // Refresh the page after signing out
-        window.location.reload();
-    } catch (error) {
+    }).catch((error) => {
         console.error('Sign out error:', error);
-    }
+    });
 });
-
-
