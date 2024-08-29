@@ -133,21 +133,7 @@ nav ul li a {
     color: #333333;
 }
 
-.upload-box {
-    width: 100%;
-    max-width: 600px;
-    height: 200px;
-    padding: 20px;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-}
 
-.upload-box.dragover {
-    border-color: #007bff;
-}
 
 .upload-section,
 .job-section,
