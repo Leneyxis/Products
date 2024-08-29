@@ -154,7 +154,20 @@ function showJobDescriptionInput() {
 }
 
 // Generate Cover Letter
+// Function to show loader
+function showLoader() {
+    document.getElementById('loader').style.display = 'flex';
+}
+
+// Function to hide loader
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+}
+
 function generateCoverLetter(description) {
+    // Show the loader
+    showLoader();
+
     // Prepare the POST request payload
     const requestData = {
         link: uploadedFileUrl, // Use the stored download URL
@@ -189,8 +202,24 @@ function generateCoverLetter(description) {
     })
     .catch((error) => {
         console.error('Error:', error);
+    })
+    .finally(() => {
+        // Hide the loader after 30 seconds
+        setTimeout(() => {
+            hideLoader();
+        }, 30000); // 30 seconds delay
     });
 }
+
+// Ensure the generate button click triggers the cover letter generation
+generateButton.addEventListener('click', () => {
+    const description = document.getElementById('job-description-input').value.trim();
+    if (description && uploadedFileUrl) {
+        generateCoverLetter(description);
+    } else {
+        alert('Please enter a job description.');
+    }
+});
 
 // Toggle UI based on user auth state
 onAuthStateChanged(auth, user => {
