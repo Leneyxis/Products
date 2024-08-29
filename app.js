@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -24,50 +24,81 @@ const storage = getStorage(app);
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
 
-// Elements
-const uploadBox = document.getElementById('upload-box');
-const resumeUpload = document.getElementById('resume-upload');
+// DOM Elements
+const signInButton = document.getElementById('sign-in-button');
+const signOutButton = document.getElementById('sign-out-button');
+const uploadSection = document.getElementById('upload-section');
+const generateSection = document.getElementById('generate-section');
+const resultSection = document.getElementById('result-section');
+const uploadBox = document.getElementById('upload-box');  // Drag and drop area
 const uploadButton = document.getElementById('upload-button');
 const generateButton = document.getElementById('generate-button');
-const generateSection = document.getElementById('step2');
-let uploadedFileUrl = ''; // To store uploaded file URL for further use
+const resumeUpload = document.getElementById('resume-upload');
+const jobDescription = document.getElementById('job-description');
+const coverLetterOutput = document.getElementById('cover-letter-output');
 
-// Drag and Drop handling
+// API URL
+const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
+
+// Variable to store the download URL
+let uploadedFileUrl = '';
+
+// Sign in event
+signInButton.addEventListener('click', () => {
+    signInWithPopup(auth, provider)
+        .then(result => {
+            console.log('User signed in:', result.user);
+            toggleUI(true);
+        })
+        .catch(error => {
+            console.error('Sign in error:', error);
+        });
+});
+
+// Sign out event
+signOutButton.addEventListener('click', () => {
+    signOut(auth)
+        .then(() => {
+            console.log('User signed out');
+            toggleUI(false);
+        })
+        .catch(error => {
+            console.error('Sign out error:', error);
+        });
+});
+
+// Drag and Drop functionality
 uploadBox.addEventListener('dragover', (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    uploadBox.classList.add('dragover'); // Visual cue for drag-over state
+    uploadBox.classList.add('dragover'); // Add visual feedback
 });
 
 uploadBox.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    e.stopPropagation();
-    uploadBox.classList.remove('dragover'); // Remove visual cue
+    uploadBox.classList.remove('dragover'); // Remove visual feedback
 });
 
 uploadBox.addEventListener('drop', (e) => {
     e.preventDefault();
-    e.stopPropagation();
     uploadBox.classList.remove('dragover');
 
     const file = e.dataTransfer.files[0];
     if (file && file.type === 'application/pdf') {
-        resumeUpload.files = e.dataTransfer.files; // Assign dropped file to input element
-        handleFileUpload(file); // Handle file upload
+        handleFileUpload(file); // Call file upload function
     } else {
         alert('Please upload a PDF file.');
     }
 });
 
-// Click-to-Select File
+// Upload resume event
 uploadButton.addEventListener('click', () => {
-    resumeUpload.click(); // Trigger hidden file input
+    resumeUpload.click(); // Trigger file input click
 });
 
 resumeUpload.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
-        handleFileUpload(file); // Handle file upload
+        handleFileUpload(file); // Call file upload function
     } else {
         alert('Please select a PDF file.');
     }
@@ -75,119 +106,93 @@ resumeUpload.addEventListener('change', (e) => {
 
 // Handle File Upload
 function handleFileUpload(file) {
-    const user = firebase.auth().currentUser;
+    const user = auth.currentUser;
     if (!user) {
         alert('Please sign in first.');
         return;
     }
-    const storageRef = firebase.storage().ref(`resumes/${user.uid}/${file.name}`);
-    storageRef.put(file)
+    
+    const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
+    uploadBytes(storageRef, file)
         .then((snapshot) => {
             console.log('File uploaded successfully');
-            return snapshot.ref.getDownloadURL();
+            return getDownloadURL(snapshot.ref); // Get the download URL
         })
         .then((url) => {
-            uploadedFileUrl = url;
-            console.log('File available at:', url);
-            document.getElementById('step1').classList.remove('active');
-            document.getElementById('step2').classList.add('active');
-            document.getElementById('job-description-box').style.display = 'block';
+            uploadedFileUrl = url; // Store the download URL
+            generateSection.style.display = 'block';
         })
         .catch(error => {
             console.error('File upload error:', error);
         });
 }
 
-// Handle Job Description and Cover Letter Generation
+// Generate cover letter event
 generateButton.addEventListener('click', () => {
-    const jobDescription = document.getElementById('job-description').value;
-    if (!uploadedFileUrl) {
-        alert('Please upload a resume first.');
-        return;
-    }
-    fetch('https://your-api-endpoint/job-description', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ jobDescription: jobDescription, resumeUrl: uploadedFileUrl }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-        document.getElementById('step2').classList.remove('active');
-        document.getElementById('step3').classList.add('active');
+    const description = jobDescription.value.trim();
+    if (description && uploadedFileUrl) {
+        // Prepare the POST request payload
+        const requestData = {
+            link: uploadedFileUrl, // Use the stored download URL
+            job_description: description
+        };
 
-        // Redirect to Stripe Checkout
-        return fetch('https://your-backend-endpoint/create-checkout-session', {
+        // Send POST request to API
+        fetch(apiUrl, {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // Parse the body to extract the URL
+            const body = JSON.parse(data.body);
+            const coverLetterUrl = body.cover_letter_url;
+
+            if (coverLetterUrl) {
+                // Trigger the download
+                const link = document.createElement('a');
+                link.href = coverLetterUrl;
+                link.download = coverLetterUrl.split('/').pop(); // Extract file name from URL
+                document.body.appendChild(link); // Append link to the body
+                link.click(); // Trigger click event
+                document.body.removeChild(link); // Remove link from the body
+                resultSection.style.display = 'block';
+            } else {
+                coverLetterOutput.innerText = 'Cover letter URL not available.';
+                resultSection.style.display = 'block';
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
-    })
-    .then(response => response.json())
-    .then(session => {
-        return stripe.redirectToCheckout({ sessionId: session.id });
-    })
-    .then(result => {
-        if (result.error) {
-            console.error('Error:', result.error.message);
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+    } else {
+        alert('Please upload a file and enter a job description.');
+    }
 });
 
-// Authentication buttons for sign-in and sign-up
-document.querySelector('.sign-in').addEventListener('click', () => {
-    handleGoogleSignIn()
-        .then(user => {
-            console.log('Signed in with Google:', user);
-        });
+// Toggle UI based on user auth state
+onAuthStateChanged(auth, user => {
+    if (user) {
+        toggleUI(true);
+    } else {
+        toggleUI(false);
+    }
 });
 
-document.querySelector('.get-started').addEventListener('click', () => {
-    handleGoogleSignIn()
-        .then(user => {
-            console.log('Signed up with Google:', user);
-            saveUserData(user);
-        });
-});
-
-// Google Sign-In Handler
-function handleGoogleSignIn() {
-    return firebase.auth().signInWithPopup(provider)
-        .then(result => result.user)
-        .catch(error => {
-            console.error('Error during sign-in:', error);
-        });
+function toggleUI(isSignedIn) {
+    if (isSignedIn) {
+        signInButton.style.display = 'none';
+        signOutButton.style.display = 'block';
+        uploadSection.style.display = 'block';
+    } else {
+        signInButton.style.display = 'block';
+        signOutButton.style.display = 'none';
+        uploadSection.style.display = 'none';
+        generateSection.style.display = 'none';
+        resultSection.style.display = 'none';
+    }
 }
-
-// Save User Data to Firestore
-function saveUserData(user) {
-    db.collection('users').doc(user.uid).set({
-        email: user.email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        console.log('User data saved');
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
-}
-
-// FAQ Toggle functionality
-document.querySelectorAll('.faq-question').forEach(item => {
-    item.addEventListener('click', () => {
-        const faqItem = item.parentElement;
-        const isVisible = faqItem.classList.contains('active');
-
-        document.querySelectorAll('.faq-item').forEach(item => {
-            item.classList.remove('active');
-        });
-
-        if (!isVisible) {
-            faqItem.classList.add('active');
-        }
-    });
-});
