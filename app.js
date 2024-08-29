@@ -207,7 +207,7 @@ function generateCoverLetter(description) {
         // Hide the loader after 30 seconds
         setTimeout(() => {
             hideLoader();
-        }, 30000); // 30 seconds delay
+        }, 15000); // 30 seconds delay
     });
 }
 
