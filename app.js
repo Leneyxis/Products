@@ -20,6 +20,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+const stripe = Stripe('YOUR_PUBLISHABLE_KEY'); // Stripe initialization
 
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
@@ -27,9 +28,9 @@ const provider = new GoogleAuthProvider();
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
-const uploadSection = document.getElementById('upload-section');
-const generateSection = document.getElementById('generate-section');
-const resultSection = document.getElementById('result-section');
+const uploadSection = document.getElementById('step1');
+const generateSection = document.getElementById('step2');
+const resultSection = document.getElementById('step3');
 const uploadButton = document.getElementById('upload-button');
 const generateButton = document.getElementById('generate-button');
 const resumeUpload = document.getElementById('resume-upload');
@@ -78,7 +79,8 @@ uploadButton.addEventListener('click', () => {
             })
             .then((url) => {
                 uploadedFileUrl = url; // Store the download URL
-                generateSection.style.display = 'block';
+                generateSection.classList.add('active');
+                document.getElementById('job-description-box').style.display = 'block';
             })
             .catch(error => {
                 console.error('File upload error:', error);
@@ -92,68 +94,44 @@ uploadButton.addEventListener('click', () => {
 generateButton.addEventListener('click', () => {
     const description = jobDescription.value.trim();
     if (description && uploadedFileUrl) {
-        // Prepare the POST request payload
         const requestData = {
-            link: uploadedFileUrl, // Use the stored download URL
+            link: uploadedFileUrl,
             job_description: description
         };
 
-        // Send POST request to API
         fetch(apiUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData),
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Success:', data);
-            // Parse the body to extract the URL
-            const body = JSON.parse(data.body);
-            const coverLetterUrl = body.cover_letter_url;
-
-            if (coverLetterUrl) {
-                // Trigger the download
-                const link = document.createElement('a');
-                link.href = coverLetterUrl;
-                link.download = coverLetterUrl.split('/').pop(); // Extract file name from URL
-                document.body.appendChild(link); // Append link to the body
-                link.click(); // Trigger click event
-                document.body.removeChild(link); // Remove link from the body
-                resultSection.style.display = 'block';
-            } else {
-                coverLetterOutput.innerText = 'Cover letter URL not available.';
-                resultSection.style.display = 'block';
-            }
+            console.log('Cover letter generated:', data.cover_letter);
+            coverLetterOutput.value = data.cover_letter; // Set the generated cover letter
+            resultSection.classList.add('active');
         })
-        .catch((error) => {
-            console.error('Error:', error);
+        .catch(error => {
+            console.error('Error generating cover letter:', error);
         });
     } else {
-        alert('Please upload a file and enter a job description.');
+        alert('Please provide a job description and upload your resume first.');
     }
 });
 
-// Toggle UI based on user auth state
-onAuthStateChanged(auth, user => {
+// Toggle UI for authentication state
+function toggleUI(isLoggedIn) {
+    signInButton.style.display = isLoggedIn ? 'none' : 'block';
+    signOutButton.style.display = isLoggedIn ? 'block' : 'none';
+    uploadSection.style.display = isLoggedIn ? 'block' : 'none';
+}
+
+// Firebase authentication state observer
+onAuthStateChanged(auth, (user) => {
     if (user) {
+        console.log('User is signed in:', user);
         toggleUI(true);
     } else {
+        console.log('No user is signed in.');
         toggleUI(false);
     }
 });
-
-function toggleUI(isSignedIn) {
-    if (isSignedIn) {
-        signInButton.style.display = 'none';
-        signOutButton.style.display = 'block';
-        uploadSection.style.display = 'block';
-    } else {
-        signInButton.style.display = 'block';
-        signOutButton.style.display = 'none';
-        uploadSection.style.display = 'none';
-        generateSection.style.display = 'none';
-        resultSection.style.display = 'none';
-    }
-}
