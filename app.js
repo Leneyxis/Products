@@ -291,16 +291,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Sign out event
-signOutButton.addEventListener('click', () => {
-    signOut(auth)
-        .then(() => {
-            console.log('User signed out');
-            toggleUI(false);
-            // Refresh the page after signing out
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Sign out error:', error);
-        });
+signOutButton.addEventListener('click', async () => {
+    try {
+        await signOut(auth);
+        console.log('User signed out');
+        toggleUI(false);
+        // Refresh the page after signing out
+        window.location.reload();
+    } catch (error) {
+        console.error('Sign out error:', error);
+    }
 });
+
 
