@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
   authDomain: "internexxus-products-65a8b.firebaseapp.com",
   projectId: "internexxus-products-65a8b",
-  storageBucket: "internexxus-products-65a8b.appspot.com",
+  storageBucket: "internexxus-products-65a8b",
   messagingSenderId: "788630683314",
   appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
   measurementId: "G-B0JLMBTZWZ"
@@ -31,6 +31,9 @@ const resumeUpload = document.getElementById('resume-upload');
 const loginModal = document.getElementById('login-modal');
 const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
+const loginButton = document.getElementById('login-button'); // Login button for email/password
+const emailInput = document.querySelector('input[type="text"]'); // Assuming the email input is of type "text"
+const passwordInput = document.querySelector('input[type="password"]');
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -78,6 +81,30 @@ googleSignInButton.addEventListener('click', () => {
         })
         .catch(error => {
             console.error('Sign in error:', error);
+        });
+});
+
+// Handle Email/Password Sign-In
+loginButton.addEventListener('click', () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed in 
+            const user = userCredential.user;
+            console.log('User signed in with email:', user);
+            loginModal.classList.remove('show');
+            setTimeout(() => {
+                loginModal.style.display = 'none';
+            }, 300);  // Wait for the transition to complete before hiding
+            toggleUI(true);
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Email sign in error:', errorCode, errorMessage);
+            alert(`Error: ${errorMessage}`);
         });
 });
 
