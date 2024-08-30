@@ -191,7 +191,6 @@ nav ul li a {
 }
 
 /* Modal Dialog */
-/* Modal Dialog */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -200,14 +199,14 @@ nav ul li a {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0,0,0,0.4);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background-color: #ffffff;
+    background-color: #fefefe;
     padding: 30px;
     border-radius: 15px;
     width: 350px;
@@ -284,6 +283,42 @@ nav ul li a {
     background-color: #333;
 }
 
+.forgot-password {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.forgot-password a {
+    color: #000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.social-login {
+    margin-top: 30px;
+}
+
+.social-login p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.google-sign-in-btn {
+    background-color: #db4437;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.google-sign-in-btn:hover {
+    background-color: #c23321;
+}
 /* Loader Styles */
 .loader {
     position: fixed;
