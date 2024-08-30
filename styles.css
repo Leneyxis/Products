@@ -378,18 +378,18 @@ nav ul li a {
 
 /* Why Use Section */
 .why-use {
-    padding: 40px 20px; /* Adjusted padding to remove extra white space */
+    padding: 30px 20px; /* Reduced padding */
     text-align: center;
 }
 
 .why-use h2 {
-    font-size: 32px;
-    margin-bottom: 20px;
+    font-size: 28px; /* Slightly smaller font size */
+    margin-bottom: 15px; /* Reduced margin */
 }
 
 .why-use p {
-    font-size: 18px;
-    margin-bottom: 40px;
+    font-size: 16px; /* Slightly smaller font size */
+    margin-bottom: 30px; /* Reduced margin */
 }
 
 /* Features and Benefits */
@@ -398,34 +398,35 @@ nav ul li a {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
+    gap: 20px; /* Added gap between items */
 }
 
 .feature,
 .benefit {
-    max-width: 300px;
+    max-width: 280px; /* Slightly reduced max-width */
     text-align: left;
-    margin-bottom: 40px;
+    margin-bottom: 20px; /* Reduced margin-bottom */
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
-    padding: 20px;
+    padding: 15px; /* Reduced padding */
 }
 
 .feature img,
 .benefit img {
-    width: 50px;
+    width: 45px; /* Slightly smaller icons */
     height: auto;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* Reduced margin-bottom */
 }
 
 .feature h3,
 .benefit h3 {
-    font-size: 24px;
-    margin-bottom: 10px;
+    font-size: 22px; /* Slightly smaller font size */
+    margin-bottom: 8px; /* Reduced margin */
 }
 
 .feature p,
 .benefit p {
-    font-size: 16px;
+    font-size: 14px; /* Slightly smaller font size */
 }
 
 /* Call to Action Section */
