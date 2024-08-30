@@ -191,6 +191,7 @@ nav ul li a {
 }
 
 /* Modal Dialog */
+/* Modal Dialog */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -214,7 +215,16 @@ nav ul li a {
     text-align: center;
     position: relative;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-50px);  /* Start slightly above the center */
+    opacity: 0;  /* Start hidden */
+    transition: all 0.3s ease;  /* Smooth transition for appearance */
 }
+
+.modal.show .modal-content {
+    transform: translateY(0);  /* Move to center */
+    opacity: 1;  /* Fade in */
+}
+
 
 .close-button {
     color: #aaa;
