@@ -40,7 +40,11 @@ let uploadedFileUrl = '';
 
 // Show login modal
 signInButton.addEventListener('click', () => {
-    loginModal.classList.add('show');
+    // Reset the modal's display and opacity to ensure it's shown properly
+    loginModal.style.display = 'flex';
+    setTimeout(() => {
+        loginModal.classList.add('show');
+    }, 10); // Slight delay to allow CSS transition to work
 });
 
 // Close login modal
@@ -83,6 +87,9 @@ signOutButton.addEventListener('click', () => {
         .then(() => {
             console.log('User signed out');
             toggleUI(false);
+            // Reset the modal's state after signing out
+            loginModal.style.display = 'none';
+            loginModal.classList.remove('show');
         })
         .catch(error => {
             console.error('Sign out error:', error);
