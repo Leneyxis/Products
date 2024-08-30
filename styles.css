@@ -74,26 +74,32 @@ nav ul li a {
     display: flex;
     max-width: 1200px;
     width: 100%;
+    align-items: center; /* Ensure items are vertically centered */
+    flex-wrap: wrap; /* Allow wrapping of content if necessary */
 }
 
 .hero img {
-    width: 400px;
-    height: auto;
+    max-width: 400px;
+    width: 100%; /* Ensure the image maintains its aspect ratio */
+    height: auto; /* Maintain aspect ratio */
     margin-right: 40px;
+    flex-shrink: 0; /* Prevent the image from shrinking */
 }
 
 .hero-text {
+    flex-grow: 1; /* Allow the text area to grow */
     max-width: 600px;
+    width: 100%;
 }
 
-.hero-text h1 {
-    font-size: 36px;
-    margin-bottom: 20px;
+.upload-box {
+    margin-top: 20px;
+    width: 100%; /* Ensure the upload box takes up available space */
+    max-width: 600px; /* Prevent it from growing too large */
 }
 
-.hero-text p {
-    font-size: 18px;
-    margin-bottom: 40px;
+.generate-button {
+    margin-top: 20px;
 }
 
 /* Progress Bar */
