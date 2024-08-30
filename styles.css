@@ -518,42 +518,36 @@ footer {
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-    .hero {
-        padding: 20px 10px;
-    }
-
     .hero-content {
-        padding: 0;
-        flex-direction: column; /* Center align content on mobile */
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
     }
 
-    .hero-text {
-        margin-bottom: 15px;
-        text-align: center; /* Center text on mobile */
-    }
-
-    .upload-box {
-        margin-top: 15px;
+    .hero img {
+        margin-right: 0;
+        margin-bottom: 20px;
     }
 
     .progress-bar {
         flex-direction: column;
-        align-items: center;
     }
 
-    .features,
-    .benefits {
-        gap: 5px;
-    }
-
-    .feature,
-    .benefit {
-        max-width: 100%;
+    .step {
+        width: 100%;
         margin-bottom: 10px;
-        text-align: center; /* Center text on mobile */
     }
 
     .faq {
+        margin: 20px auto;
         padding: 15px;
+    }
+
+    .cta {
+        padding: 40px 20px;
+    }
+
+    .cta h2 {
+        font-size: 28px;
     }
 }
