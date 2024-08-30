@@ -255,17 +255,19 @@ nav ul li a {
 
 .input-container input {
     width: 100%;
-    padding: 10px 15px;
-    border: 2px solid #ccc;
-    border-radius: 30px;
+    padding: 12px 20px; /* Increased padding for better spacing */
+    border: 1px solid #ccc; /* Reduced border thickness for a cleaner look */
+    border-radius: 25px; /* More rounded edges to match the overall style */
     outline: none;
     font-size: 16px;
     color: #333;
-    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .input-container input:focus {
-    border-color: #333;
+    border-color: #000; /* Darker border on focus for better visibility */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on focus */
 }
 
 .login-btn {
