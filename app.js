@@ -28,6 +28,9 @@ const signOutButton = document.getElementById('sign-out-button');
 const uploadBox = document.getElementById('upload-box');
 const uploadButton = document.getElementById('upload-button');
 const resumeUpload = document.getElementById('resume-upload');
+const loginModal = document.getElementById('login-modal');
+const closeButton = document.querySelector('.close-button');
+const googleSignInButton = document.getElementById('google-sign-in');
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -35,11 +38,29 @@ const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/r
 // Variable to store the download URL
 let uploadedFileUrl = '';
 
-// Sign in event
+// Show login modal
 signInButton.addEventListener('click', () => {
+    loginModal.style.display = 'block';
+});
+
+// Close login modal
+closeButton.addEventListener('click', () => {
+    loginModal.style.display = 'none';
+});
+
+// Close modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === loginModal) {
+        loginModal.style.display = 'none';
+    }
+});
+
+// Handle Google Sign-In from modal
+googleSignInButton.addEventListener('click', () => {
     signInWithPopup(auth, provider)
         .then(result => {
             console.log('User signed in:', result.user);
+            loginModal.style.display = 'none';
             toggleUI(true);
         })
         .catch(error => {
