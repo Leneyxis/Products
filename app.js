@@ -39,11 +39,15 @@ const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/r
 let uploadedFileUrl = '';
 
 // Show login modal
+// Show login modal
 signInButton.addEventListener('click', () => {
-    loginModal.style.display = 'block';
-
-    // Ensure the modal is centered after being displayed
-    centerModal();
+    loginModal.style.display = 'flex';
+    
+    // Force a reflow to ensure the modal content's transition triggers correctly
+    void loginModal.offsetWidth;  
+    
+    // Add the 'show' class to trigger the transition
+    loginModal.classList.add('show');
 });
 
 // Function to center the modal
@@ -69,13 +73,21 @@ function centerModal() {
 
 // Close login modal
 closeButton.addEventListener('click', () => {
-    loginModal.style.display = 'none';
+    // Remove the 'show' class before hiding the modal
+    loginModal.classList.remove('show');
+    setTimeout(() => {
+        loginModal.style.display = 'none';
+    }, 300);  // Wait for the transition to complete before hiding
 });
 
 // Close modal when clicking outside of it
 window.addEventListener('click', (event) => {
     if (event.target === loginModal) {
-        loginModal.style.display = 'none';
+        // Remove the 'show' class before hiding the modal
+        loginModal.classList.remove('show');
+        setTimeout(() => {
+            loginModal.style.display = 'none';
+        }, 300);  // Wait for the transition to complete before hiding
     }
 });
 
@@ -84,7 +96,10 @@ googleSignInButton.addEventListener('click', () => {
     signInWithPopup(auth, provider)
         .then(result => {
             console.log('User signed in:', result.user);
-            loginModal.style.display = 'none';
+            loginModal.classList.remove('show');
+            setTimeout(() => {
+                loginModal.style.display = 'none';
+            }, 300);  // Wait for the transition to complete before hiding
             toggleUI(true);
         })
         .catch(error => {
