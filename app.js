@@ -41,7 +41,31 @@ let uploadedFileUrl = '';
 // Show login modal
 signInButton.addEventListener('click', () => {
     loginModal.style.display = 'block';
+
+    // Ensure the modal is centered after being displayed
+    centerModal();
 });
+
+// Function to center the modal
+function centerModal() {
+    const modalContent = document.querySelector('.modal-content');
+    const modal = document.getElementById('login-modal');
+
+    // Set the modal to flex to ensure centering
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+
+    // Set a small timeout to ensure that the browser has time to render the modal
+    setTimeout(() => {
+        const topOffset = (window.innerHeight - modalContent.clientHeight) / 2;
+        const leftOffset = (window.innerWidth - modalContent.clientWidth) / 2;
+
+        // Apply top and left offsets
+        modalContent.style.marginTop = `${topOffset}px`;
+        modalContent.style.marginLeft = `${leftOffset}px`;
+    }, 0);
+}
 
 // Close login modal
 closeButton.addEventListener('click', () => {
@@ -67,6 +91,7 @@ googleSignInButton.addEventListener('click', () => {
             console.error('Sign in error:', error);
         });
 });
+
 
 // Sign out event
 signOutButton.addEventListener('click', () => {
