@@ -527,13 +527,33 @@ footer {
         padding: 0 15px;
     }
 
+    .hero img {
+        margin-right: 0;
+        margin-bottom: 20px;
+        max-width: 250px;
+    }
+
+    .upload-box {
+        padding: 0;
+    }
+
+    .progress-bar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .step {
+        margin-bottom: 10px;
+        width: auto;
+    }
+
     .how-it-works .steps,
     .why-use .benefits {
         flex-direction: column;
         align-items: center;
         gap: 15px;
     }
-    
+
     .how-it-works .step,
     .why-use .benefit {
         max-width: 90%;
