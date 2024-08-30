@@ -398,7 +398,7 @@ nav ul li a {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 20px; /* Added gap between items */
+    gap: 10px; /* Reduced gap between items */
 }
 
 .feature,
