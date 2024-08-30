@@ -68,35 +68,34 @@ nav ul li a {
     padding: 40px 20px;
     background-image: url('backdrop.jpg');
     background-size: cover;
-    text-align: center;
 }
 
 .hero-content {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     max-width: 1200px;
     width: 100%;
-    padding: 0 15px;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .hero img {
-    max-width: 250px;
+    max-width: 400px;
     width: 100%;
     height: auto;
-    margin-bottom: 20px;
+    margin-right: 40px;
+    flex-shrink: 0;
 }
 
 .hero-text {
+    flex-grow: 1;
     max-width: 600px;
     width: 100%;
-    margin-bottom: 20px;
 }
 
 .upload-box {
+    margin-top: 20px;
     width: 100%;
     max-width: 600px;
-    margin-top: 20px;
 }
 
 .generate-button {
@@ -106,8 +105,7 @@ nav ul li a {
 /* Progress Bar */
 .progress-bar {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
     margin-bottom: 20px;
 }
 
@@ -115,8 +113,7 @@ nav ul li a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: auto;
-    margin-bottom: 10px;
+    width: 33%;
 }
 
 .step .circle {
@@ -527,14 +524,21 @@ footer {
 
     .hero-content {
         padding: 0;
+        flex-direction: column; /* Center align content on mobile */
     }
 
     .hero-text {
         margin-bottom: 15px;
+        text-align: center; /* Center text on mobile */
     }
 
     .upload-box {
         margin-top: 15px;
+    }
+
+    .progress-bar {
+        flex-direction: column;
+        align-items: center;
     }
 
     .features,
@@ -546,6 +550,7 @@ footer {
     .benefit {
         max-width: 100%;
         margin-bottom: 10px;
+        text-align: center; /* Center text on mobile */
     }
 
     .faq {
