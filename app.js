@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
   authDomain: "internexxus-products-65a8b.firebaseapp.com",
   projectId: "internexxus-products-65a8b",
-  storageBucket: "internexxus-products-65a8b",
+  storageBucket: "internexxus-products-65a8b.appspot.com",
   messagingSenderId: "788630683314",
   appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
   measurementId: "G-B0JLMBTZWZ"
@@ -21,7 +21,6 @@ const storage = getStorage(app);
 
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
-
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
