@@ -377,19 +377,17 @@ nav ul li a {
 }
 
 /* How It Works and Why Use Sections */
-.how-it-works,
 .why-use {
     padding: 60px 20px;
     text-align: center;
 }
 
-.how-it-works h2,
 .why-use h2 {
     font-size: 32px;
     margin-bottom: 20px;
 }
 
-.how-it-works p,
+
 .why-use p {
     font-size: 18px;
     margin-bottom: 40px;
