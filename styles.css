@@ -65,7 +65,7 @@ nav ul li a {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 60px 20px;
+    padding: 40px 20px; /* Adjusted padding to remove extra white space */
     background-image: url('backdrop.jpg');
     background-size: cover; /* Ensure the image covers the hero section */
 }
@@ -376,9 +376,9 @@ nav ul li a {
     border: none; /* Remove border */
 }
 
-/* How It Works and Why Use Sections */
+/* Why Use Section */
 .why-use {
-    padding: 60px 20px;
+    padding: 40px 20px; /* Adjusted padding to remove extra white space */
     text-align: center;
 }
 
@@ -386,7 +386,6 @@ nav ul li a {
     font-size: 32px;
     margin-bottom: 20px;
 }
-
 
 .why-use p {
     font-size: 18px;
@@ -455,9 +454,9 @@ nav ul li a {
 
 /* FAQ Section */
 .faq {
-    margin: auto;
+    margin: 40px auto; /* Added margin around the FAQ section */
     width: 90%;
-    max-width: 1315px;
+    max-width: 1200px; /* Adjusted for consistent layout */
     padding: 20px;
     text-align: justify;
     border: 1px solid #ddd;
