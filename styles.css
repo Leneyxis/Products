@@ -393,40 +393,32 @@ nav ul li a {
 }
 
 /* Features and Benefits */
-.features,
 .benefits {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 10px; /* Adjusted gap between items */
 }
 
-.feature,
 .benefit {
-    max-width: 280px;
+    max-width: 300px; /* Adjusted for consistent layout */
+    flex-grow: 1;
     text-align: left;
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Adjusted margin-bottom */
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
-    padding: 15px;
+    padding: 20px;
+    box-sizing: border-box; /* Ensures padding and border are included in the width/height */
 }
 
-.feature img,
-.benefit img {
-    width: 45px;
-    height: auto;
-    margin-bottom: 15px;
-}
-
-.feature h3,
 .benefit h3 {
-    font-size: 22px;
-    margin-bottom: 8px;
+    font-size: 22px; /* Adjusted size */
+    margin-bottom: 10px;
 }
 
-.feature p,
 .benefit p {
-    font-size: 14px;
+    font-size: 16px;
+    margin-bottom: 0;
 }
 
 /* Call to Action Section */
