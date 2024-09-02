@@ -393,32 +393,40 @@ nav ul li a {
 }
 
 /* Features and Benefits */
+.features,
 .benefits {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     flex-wrap: wrap;
-    gap: 20px; /* Reduced gap between items */
+    gap: 10px;
 }
 
+.feature,
 .benefit {
-    max-width: 300px; /* Fixed width to ensure consistency */
-    flex-grow: 1;
+    max-width: 280px;
     text-align: left;
-    margin: 0 auto; /* Center the tiles horizontally */
+    margin-bottom: 20px;
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
-    padding: 20px;
-    box-sizing: border-box;
+    padding: 15px;
 }
 
+.feature img,
+.benefit img {
+    width: 45px;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.feature h3,
 .benefit h3 {
-    font-size: 22px; /* Adjusted size */
-    margin-bottom: 10px;
+    font-size: 22px;
+    margin-bottom: 8px;
 }
 
+.feature p,
 .benefit p {
-    font-size: 16px;
-    margin-bottom: 0;
+    font-size: 14px;
 }
 
 /* Call to Action Section */
