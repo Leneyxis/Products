@@ -193,15 +193,6 @@ nav ul li a {
     margin: 0 0 20px;
 }
 
-.upload-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
 #job-description-input {
     width: 100%;
     max-width: 600px;
@@ -431,13 +422,14 @@ nav ul li a {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
+    gap: 15px; /* Added gap between items */
 }
 
 .feature,
 .benefit {
     max-width: 280px;
     text-align: left;
-    margin-bottom: 20px;
+    margin-bottom: 10px; /* Reduced margin-bottom */
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
     padding: 15px;
