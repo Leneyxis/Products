@@ -1,7 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -18,9 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
+const db = getFirestore(app);  // Initialize Firestore
 
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
+
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
@@ -200,7 +203,7 @@ function showJobDescriptionInput() {
     generateButton.addEventListener('click', () => {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
-            generateCoverLetter(description);
+            checkPaymentStatusAndGenerate(description);
         } else {
             alert('Please enter a job description.');
         }
@@ -236,11 +239,9 @@ function generateCoverLetter(description) {
     .then(response => response.json())
     .then(data => {
         console.log('Success:', data);
-        // Use the fixed Stripe payment URL
         const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145';
 
         if (stripePaymentUrl) {
-            // Redirect to Stripe payment
             redirectToStripePayment(stripePaymentUrl);
         } else {
             alert('Payment URL not available.');
@@ -259,15 +260,20 @@ function redirectToStripePayment(stripeUrl) {
     window.location.href = stripeUrl;
 }
 
-// Handle successful payment and download
+// Handle successful payment and update Firestore
 function handleSuccessfulPayment() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment_status');
     const coverLetterUrl = urlParams.get('cover_letter_url');
+    const user = auth.currentUser;
 
-    if (paymentStatus === 'success' && coverLetterUrl) {
+    if (paymentStatus === 'success' && coverLetterUrl && user) {
         document.getElementById('payment-success').style.display = 'block';
-        
+
+        // Update Firestore with payment status
+        const userDocRef = doc(db, 'users', user.uid);
+        setDoc(userDocRef, { paymentStatus: 'success' }, { merge: true });
+
         // Trigger the download
         const link = document.createElement('a');
         link.href = coverLetterUrl;
@@ -276,6 +282,29 @@ function handleSuccessfulPayment() {
         link.click();
         document.body.removeChild(link);
     }
+}
+
+// Check payment status before generating cover letter
+function checkPaymentStatusAndGenerate(description) {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert('Please sign in first.');
+        return;
+    }
+
+    const userDocRef = doc(db, 'users', user.uid);
+    getDoc(userDocRef).then((docSnap) => {
+        if (docSnap.exists() && docSnap.data().paymentStatus === 'success') {
+            console.log('User has already paid. Proceeding to generate cover letter.');
+            generateCoverLetter(description);
+        } else {
+            console.log('User has not paid. Redirecting to payment.');
+            redirectToStripePayment('https://buy.stripe.com/9AQ03N36954wbcs145');
+        }
+    }).catch((error) => {
+        console.error('Error checking payment status:', error);
+    });
 }
 
 // Check for successful payment on page load
