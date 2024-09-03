@@ -92,21 +92,11 @@ nav ul li a {
     width: 100%;
 }
 
-.upload-box {
-    margin-top: 20px;
-    width: 100%;
-    max-width: 600px;
-}
-
-.generate-button {
-    margin-top: 20px;
-}
-
 /* Progress Bar */
 .progress-bar {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin: 20px 0;
 }
 
 .step {
@@ -140,7 +130,7 @@ nav ul li a {
 }
 
 /* Upload and Job Description Sections */
-.upload-section {
+.upload-box {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -191,6 +181,15 @@ nav ul li a {
 
 .upload-box p {
     margin: 0 0 20px;
+}
+
+.upload-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #job-description-input {
@@ -422,14 +421,13 @@ nav ul li a {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
-    gap: 15px; /* Added gap between items */
 }
 
 .feature,
 .benefit {
     max-width: 280px;
     text-align: left;
-    margin-bottom: 10px; /* Reduced margin-bottom */
+    margin-bottom: 20px;
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
     padding: 15px;
