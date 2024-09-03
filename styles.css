@@ -396,9 +396,9 @@ nav ul li a {
 .features,
 .benefits {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 5px;
 }
 
 .feature,
