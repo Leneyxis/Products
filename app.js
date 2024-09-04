@@ -30,9 +30,12 @@ const resumeUpload = document.getElementById('resume-upload');
 const loginModal = document.getElementById('login-modal');
 const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
-const loginButton = document.getElementById('login-button'); // Login button for email/password
-const emailInput = document.querySelector('input[type="text"]'); // Assuming the email input is of type "text"
+const loginButton = document.getElementById('login-button'); 
+const signupButton = document.getElementById('signup-button');
+const emailInput = document.querySelector('input[type="text"]');
 const passwordInput = document.querySelector('input[type="password"]');
+const toggleLink = document.getElementById('toggle-link');
+let isSignUpMode = false;
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -40,9 +43,23 @@ const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/r
 // Variable to store the download URL
 let uploadedFileUrl = '';
 
+// Toggle between Sign-In and Sign-Up
+toggleLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    isSignUpMode = !isSignUpMode;
+    if (isSignUpMode) {
+        document.getElementById('login-button').style.display = 'none';
+        signupButton.style.display = 'block';
+        toggleLink.textContent = 'Already have an account? Sign In';
+    } else {
+        document.getElementById('login-button').style.display = 'block';
+        signupButton.style.display = 'none';
+        toggleLink.textContent = 'Don’t have an account? Sign Up';
+    }
+});
+
 // Show login modal
 signInButton.addEventListener('click', () => {
-    // Reset the modal's display and opacity to ensure it's shown properly
     loginModal.style.display = 'flex';
     setTimeout(() => {
         loginModal.classList.add('show');
@@ -55,16 +72,6 @@ closeButton.addEventListener('click', () => {
     setTimeout(() => {
         loginModal.style.display = 'none';
     }, 300);  // Wait for the transition to complete before hiding
-});
-
-// Close modal when clicking outside of it
-window.addEventListener('click', (event) => {
-    if (event.target === loginModal) {
-        loginModal.classList.remove('show');
-        setTimeout(() => {
-            loginModal.style.display = 'none';
-        }, 300);  // Wait for the transition to complete before hiding
-    }
 });
 
 // Handle Google Sign-In from modal
@@ -90,7 +97,6 @@ loginButton.addEventListener('click', () => {
 
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            // Signed in 
             const user = userCredential.user;
             console.log('User signed in with email:', user);
             loginModal.classList.remove('show');
@@ -107,19 +113,49 @@ loginButton.addEventListener('click', () => {
         });
 });
 
+// Handle Email/Password Sign-Up
+signupButton.addEventListener('click', () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log('User signed up:', user);
+            toggleUI(true);
+            loginModal.style.display = 'none'; // Hide modal after sign-up
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Sign up error:', errorCode, errorMessage);
+            alert(`Sign up failed: ${errorMessage}`);
+        });
+});
+
 // Sign out event
 signOutButton.addEventListener('click', () => {
     signOut(auth)
         .then(() => {
             console.log('User signed out');
             toggleUI(false);
-            // Reset the modal's state after signing out
             loginModal.style.display = 'none';
             loginModal.classList.remove('show');
         })
         .catch(error => {
             console.error('Sign out error:', error);
         });
+});
+
+// Enforce sign-in before allowing uploads
+uploadButton.addEventListener('click', () => {
+    const user = auth.currentUser;
+    if (!user) {
+        loginModal.style.display = 'flex';
+        loginModal.classList.add('show');
+    } else {
+        resumeUpload.click();
+    }
 });
 
 // Drag and Drop functionality
