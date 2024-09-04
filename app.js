@@ -359,3 +359,17 @@ function updateProgressBar(stepIndex) {
         }
     });
 }
+
+// FAQ Toggle
+document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const isVisible = answer.style.display === 'block';
+        
+        // Hide all answers
+        document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
+        
+        // Toggle current answer
+        answer.style.display = isVisible ? 'none' : 'block';
+    });
+});
