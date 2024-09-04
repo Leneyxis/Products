@@ -35,7 +35,9 @@ const signupButton = document.getElementById('signup-button');
 const emailInput = document.querySelector('input[type="text"]');
 const passwordInput = document.querySelector('input[type="password"]');
 const toggleLink = document.getElementById('toggle-link');
+const steps = document.querySelectorAll('.step');  // Progress bar steps
 let isSignUpMode = false;
+let currentStep = 0;
 
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
@@ -216,6 +218,8 @@ function handleFileUpload(file) {
         return;
     }
 
+    showLoader();  // Show loader while uploading
+
     const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
     uploadBytes(storageRef, file)
         .then((snapshot) => {
@@ -224,9 +228,12 @@ function handleFileUpload(file) {
         })
         .then((url) => {
             uploadedFileUrl = url;
-            showJobDescriptionInput();
+            hideLoader();  // Hide loader after upload
+            updateProgressBar(1);  // Move to step 2 when file upload is done
+            showJobDescriptionInput();  // Proceed to show job description input
         })
         .catch(error => {
+            hideLoader();  // Hide loader if there’s an error
             console.error('File upload error:', error);
         });
 }
@@ -249,6 +256,7 @@ function showJobDescriptionInput() {
     generateButton.addEventListener('click', () => {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
+            updateProgressBar(2);  // Move to step 3 on Generate button click
             generateCoverLetter(description);
         } else {
             alert('Please enter a job description.');
@@ -332,50 +340,13 @@ document.addEventListener('DOMContentLoaded', () => {
     handleSuccessfulPayment();
 });
 
-// FAQ Toggle
-document.querySelectorAll('.faq-question').forEach(question => {
-    question.addEventListener('click', () => {
-        const answer = question.nextElementSibling;
-        const isVisible = answer.style.display === 'block';
-        
-        // Hide all answers
-        document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
-        
-        // Toggle current answer
-        answer.style.display = isVisible ? 'none' : 'block';
-    });
-});
-
-// Update Progress Bar
-document.addEventListener('DOMContentLoaded', () => {
-    const steps = document.querySelectorAll('.step');
-    const uploadButton = document.querySelector('.upload-button');
-    const jobDescriptionInput = document.querySelector('#job-description-input');
-    const generateButton = document.querySelector('.generate-button');
-
-    let currentStep = 0;
-
-    function updateProgressBar(stepIndex) {
-        steps.forEach((step, index) => {
-            if (index <= stepIndex) {
-                step.classList.add('active');
-            } else {
-                step.classList.remove('active');
-            }
-        });
-    }
-
-    uploadButton.addEventListener('click', () => {
-        currentStep = 1; // Move to step 1 (upload job description)
-        updateProgressBar(currentStep);
-    });
-
-    generateButton.addEventListener('click', () => {
-        if (jobDescriptionInput.value.trim() !== '') {
-            currentStep = 3; // Move to step 2 (generate results)
-            updateProgressBar(currentStep);
+// Function to update the progress bar
+function updateProgressBar(stepIndex) {
+    steps.forEach((step, index) => {
+        if (index <= stepIndex) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
         }
     });
-
-    // Optional: Handle any other events that should update the progress bar
-});
+}
