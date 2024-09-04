@@ -6,13 +6,7 @@ import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/fireb
 
 // Your Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
-  authDomain: "internexxus-products-65a8b.firebaseapp.com",
-  projectId: "internexxus-products-65a8b",
-  storageBucket: "internexxus-products-65a8b.appspot.com",
-  messagingSenderId: "788630683314",
-  appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
-  measurementId: "G-B0JLMBTZWZ"
+  // Add your Firebase project configuration here
 };
 
 // Initialize Firebase
@@ -37,8 +31,8 @@ const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
 const loginButton = document.getElementById('login-button');
 const signupButton = document.getElementById('signup-button');
-const emailInput = document.querySelector('input[type="text"]');
-const passwordInput = document.querySelector('input[type="password"]');
+const emailInput = document.getElementById('login-email');
+const passwordInput = document.getElementById('login-password');
 const signupEmail = document.getElementById('signup-email');
 const signupPassword = document.getElementById('signup-password');
 
