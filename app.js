@@ -58,7 +58,19 @@ signUpButton.addEventListener('click', () => {
     }, 10);
 });
 
-// Close login modal
+// Show sign up modal when clicking "Sign Up" in login modal
+document.getElementById('sign-up-link').addEventListener('click', () => {
+    loginModal.classList.remove('show');
+    setTimeout(() => {
+        loginModal.style.display = 'none';
+        signupModal.style.display = 'flex';
+        setTimeout(() => {
+            signupModal.classList.add('show');
+        }, 10);
+    }, 300);
+});
+
+// Close login/signup modal
 closeButton.addEventListener('click', () => {
     loginModal.classList.remove('show');
     signupModal.classList.remove('show');
@@ -140,7 +152,25 @@ signOutButton.addEventListener('click', () => {
         });
 });
 
-// Drag and Drop functionality
+// Check authentication before allowing file uploads
+function checkAuthenticationBeforeUpload() {
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("Please sign in or sign up to upload your resume.");
+        loginModal.style.display = 'flex';
+        setTimeout(() => {
+            loginModal.classList.add('show');
+        }, 10);
+    } else {
+        // If user is authenticated, trigger the file input click
+        resumeUpload.click();
+    }
+}
+
+uploadButton.addEventListener('click', checkAuthenticationBeforeUpload);
+
+// Drag and Drop functionality with authentication check
 uploadBox.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadBox.classList.add('dragover');
@@ -155,27 +185,21 @@ uploadBox.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadBox.classList.remove('dragover');
 
+    const user = auth.currentUser;
+    if (!user) {
+        alert("Please sign in or sign up to upload your resume.");
+        loginModal.style.display = 'flex';
+        setTimeout(() => {
+            loginModal.classList.add('show');
+        }, 10);
+        return;
+    }
+
     const file = e.dataTransfer.files[0];
     if (file && file.type === 'application/pdf') {
         handleFileUpload(file);
     } else {
         alert('Please upload a PDF file.');
-    }
-});
-
-// Upload resume event
-uploadButton.addEventListener('click', () => {
-    const user = auth.currentUser;
-
-    if (!user) {
-        // If the user is not signed in, prompt them to sign in
-        alert("Please sign in first to upload your resume.");
-        loginModal.style.display = 'flex';
-        setTimeout(() => {
-            loginModal.classList.add('show');
-        }, 10);
-    } else {
-        resumeUpload.click();
     }
 });
 
