@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -27,47 +27,45 @@ const provider = new GoogleAuthProvider();
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
+const signUpButton = document.getElementById('sign-up-button');
 const uploadBox = document.getElementById('upload-box');
 const uploadButton = document.getElementById('upload-button');
 const resumeUpload = document.getElementById('resume-upload');
 const loginModal = document.getElementById('login-modal');
+const signupModal = document.getElementById('signup-modal');
 const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
-const loginButton = document.getElementById('login-button'); // Login button for email/password
-const emailInput = document.querySelector('input[type="text"]'); // Assuming the email input is of type "text"
+const loginButton = document.getElementById('login-button');
+const signupButton = document.getElementById('signup-button');
+const emailInput = document.querySelector('input[type="text"]');
 const passwordInput = document.querySelector('input[type="password"]');
-
-// API URL
-const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
-
-// Variable to store the download URL
-let uploadedFileUrl = '';
+const signupEmail = document.getElementById('signup-email');
+const signupPassword = document.getElementById('signup-password');
 
 // Show login modal
 signInButton.addEventListener('click', () => {
-    // Reset the modal's display and opacity to ensure it's shown properly
     loginModal.style.display = 'flex';
     setTimeout(() => {
         loginModal.classList.add('show');
-    }, 10); // Slight delay to allow CSS transition to work
+    }, 10);
+});
+
+// Show sign up modal
+signUpButton.addEventListener('click', () => {
+    signupModal.style.display = 'flex';
+    setTimeout(() => {
+        signupModal.classList.add('show');
+    }, 10);
 });
 
 // Close login modal
 closeButton.addEventListener('click', () => {
     loginModal.classList.remove('show');
+    signupModal.classList.remove('show');
     setTimeout(() => {
         loginModal.style.display = 'none';
-    }, 300);  // Wait for the transition to complete before hiding
-});
-
-// Close modal when clicking outside of it
-window.addEventListener('click', (event) => {
-    if (event.target === loginModal) {
-        loginModal.classList.remove('show');
-        setTimeout(() => {
-            loginModal.style.display = 'none';
-        }, 300);  // Wait for the transition to complete before hiding
-    }
+        signupModal.style.display = 'none';
+    }, 300);
 });
 
 // Handle Google Sign-In from modal
@@ -78,7 +76,7 @@ googleSignInButton.addEventListener('click', () => {
             loginModal.classList.remove('show');
             setTimeout(() => {
                 loginModal.style.display = 'none';
-            }, 300);  // Wait for the transition to complete before hiding
+            }, 300);
             toggleUI(true);
         })
         .catch(error => {
@@ -93,20 +91,38 @@ loginButton.addEventListener('click', () => {
 
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-            // Signed in 
             const user = userCredential.user;
             console.log('User signed in with email:', user);
             loginModal.classList.remove('show');
             setTimeout(() => {
                 loginModal.style.display = 'none';
-            }, 300);  // Wait for the transition to complete before hiding
+            }, 300);
             toggleUI(true);
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.error('Email sign in error:', errorCode, errorMessage);
-            alert(`Error: ${errorMessage}`);
+            console.error('Email sign-in error:', error);
+            alert(`Error: ${error.message}`);
+        });
+});
+
+// Handle Email/Password Sign-Up
+signupButton.addEventListener('click', () => {
+    const email = signupEmail.value;
+    const password = signupPassword.value;
+
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            console.log('User signed up:', user);
+            signupModal.classList.remove('show');
+            setTimeout(() => {
+                signupModal.style.display = 'none';
+            }, 300);
+            toggleUI(true);
+        })
+        .catch((error) => {
+            console.error('Email sign-up error:', error);
+            alert(`Error: ${error.message}`);
         });
 });
 
@@ -116,7 +132,6 @@ signOutButton.addEventListener('click', () => {
         .then(() => {
             console.log('User signed out');
             toggleUI(false);
-            // Reset the modal's state after signing out
             loginModal.style.display = 'none';
             loginModal.classList.remove('show');
         })
@@ -155,18 +170,14 @@ uploadButton.addEventListener('click', () => {
     if (!user) {
         // If the user is not signed in, prompt them to sign in
         alert("Please sign in first to upload your resume.");
-        // Open the login modal
         loginModal.style.display = 'flex';
         setTimeout(() => {
             loginModal.classList.add('show');
         }, 10);
     } else {
-        // If the user is signed in, trigger the file input click
         resumeUpload.click();
     }
 });
-
-
 
 // Handle File Upload
 function handleFileUpload(file) {
@@ -276,11 +287,9 @@ function handleSuccessfulPayment() {
     if (paymentStatus === 'success' && coverLetterUrl && user) {
         document.getElementById('payment-success').style.display = 'block';
 
-        // Update Firestore with payment status
         const userDocRef = doc(db, 'users', user.uid);
         setDoc(userDocRef, { paymentStatus: 'success' }, { merge: true });
 
-        // Trigger the download
         const link = document.createElement('a');
         link.href = coverLetterUrl;
         link.download = coverLetterUrl.split('/').pop();
@@ -331,11 +340,9 @@ function toggleUI(isSignedIn) {
     if (isSignedIn) {
         signInButton.style.display = 'none';
         signOutButton.style.display = 'block';
-        // Keep the upload box always visible, even when not signed in
     } else {
         signInButton.style.display = 'block';
         signOutButton.style.display = 'none';
-        // Keep the upload box visible, but don't allow file upload without sign-in
     }
 }
 
@@ -344,11 +351,9 @@ document.querySelectorAll('.faq-question').forEach(question => {
     question.addEventListener('click', () => {
         const answer = question.nextElementSibling;
         const isVisible = answer.style.display === 'block';
-        
-        // Hide all answers
+
         document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
-        
-        // Toggle current answer
+
         answer.style.display = isVisible ? 'none' : 'block';
     });
 });
@@ -373,16 +378,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     uploadButton.addEventListener('click', () => {
-        currentStep = 1; // Move to step 1 (upload job description)
+        currentStep = 1;
         updateProgressBar(currentStep);
     });
 
     generateButton.addEventListener('click', () => {
         if (jobDescriptionInput.value.trim() !== '') {
-            currentStep = 2; // Move to step 2 (generate results)
+            currentStep = 2;
             updateProgressBar(currentStep);
         }
     });
-
-    // Optional: Handle any other events that should update the progress bar
 });
