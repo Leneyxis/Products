@@ -543,16 +543,23 @@ footer {
     .hero-content {
         flex-direction: column;
         text-align: center;
-        padding: 20px;
+        padding: 10px 20px; /* Reduced padding */
     }
 
     .hero img {
         margin-right: 0;
-        margin-bottom: 20px;
+        margin-bottom: 10px; /* Reduced margin around the image */
+        max-width: 200px; /* Optional: Reduce image size */
+    }
+
+    .hero-text {
+        margin-top: 10px; /* Bring the text closer to the image */
+        max-width: 100%; /* Ensure the text fills the available space */
     }
 
     .progress-bar {
         flex-direction: column;
+        margin-top: 15px; /* Reduced margin between progress steps */
     }
 
     .step {
@@ -560,19 +567,22 @@ footer {
         margin-bottom: 10px;
     }
 
-    .faq {
-        margin: 20px auto;
-        padding: 15px;
+    .upload-box {
+        padding: 10px 15px; /* Reduced padding inside the upload box */
+        margin: 10px auto; /* Reduced margin around the upload box */
     }
 
     .cta {
-        padding: 40px 20px;
+        padding: 40px 20px; /* Reduced padding */
     }
 
     .cta h2 {
-        font-size: 28px;
+        font-size: 28px; /* Slightly smaller font for mobile */
     }
+
+    /* Adjust any other sections based on need */
 }
+
 
 #login-button, #signup-button {
     width: 100%;
