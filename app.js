@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
@@ -147,13 +147,30 @@ signOutButton.addEventListener('click', () => {
         });
 });
 
-// Enforce sign-in before allowing uploads
+// Toggle UI based on user auth state
+function toggleUI(isSignedIn) {
+    if (isSignedIn) {
+        signInButton.style.display = 'none';
+        signOutButton.style.display = 'block';
+        uploadBox.style.display = 'block'; // Keep upload box visible
+    } else {
+        signInButton.style.display = 'block';
+        signOutButton.style.display = 'none';
+        uploadBox.style.display = 'block'; // Keep upload box visible even when signed out
+    }
+}
+
+// Prevent upload if not signed in
 uploadButton.addEventListener('click', () => {
     const user = auth.currentUser;
     if (!user) {
+        // If user is not signed in, trigger the login modal
         loginModal.style.display = 'flex';
-        loginModal.classList.add('show');
+        setTimeout(() => {
+            loginModal.classList.add('show');
+        }, 10);  // Slight delay to allow CSS transition
     } else {
+        // If signed in, trigger the file upload
         resumeUpload.click();
     }
 });
@@ -182,10 +199,6 @@ uploadBox.addEventListener('drop', (e) => {
 });
 
 // Upload resume event
-uploadButton.addEventListener('click', () => {
-    resumeUpload.click();
-});
-
 resumeUpload.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
@@ -317,58 +330,6 @@ function handleSuccessfulPayment() {
 // Check for successful payment on page load
 document.addEventListener('DOMContentLoaded', () => {
     handleSuccessfulPayment();
-});
-
-// Toggle UI based on user auth state
-function toggleUI(isSignedIn) {
-    if (isSignedIn) {
-        signInButton.style.display = 'none';
-        signOutButton.style.display = 'block';
-        // The upload box should always be visible regardless of auth state
-    } else {
-        signInButton.style.display = 'block';
-        signOutButton.style.display = 'none';
-        // Keep uploadBox visible even when signed out
-    }
-}
-
-// Prevent upload if not signed in
-uploadButton.addEventListener('click', () => {
-    const user = auth.currentUser;
-    if (!user) {
-        // If user is not signed in, trigger the login modal
-        loginModal.style.display = 'flex';
-        loginModal.classList.add('show');
-    } else {
-        // If signed in, trigger the file upload
-        resumeUpload.click();
-    }
-});
-
-function toggleUI(isSignedIn) {
-    if (isSignedIn) {
-        signInButton.style.display = 'none';
-        signOutButton.style.display = 'block';
-        uploadBox.style.display = 'block'; // Assuming this is the intended behavior
-    } else {
-        signInButton.style.display = 'block';
-        signOutButton.style.display = 'none';
-        uploadBox.style.display = 'none';
-    }
-}
-
-// FAQ Toggle
-document.querySelectorAll('.faq-question').forEach(question => {
-    question.addEventListener('click', () => {
-        const answer = question.nextElementSibling;
-        const isVisible = answer.style.display === 'block';
-        
-        // Hide all answers
-        document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
-        
-        // Toggle current answer
-        answer.style.display = isVisible ? 'none' : 'block';
-    });
 });
 
 // Update Progress Bar
