@@ -2,18 +2,22 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
-  // Add your Firebase project configuration here
+  apiKey: "AIzaSyDvPjN4aeHU2H0UtHfOHWdLy4clx5uGR-k",
+  authDomain: "internexxus-products-65a8b.firebaseapp.com",
+  projectId: "internexxus-products-65a8b",
+  storageBucket: "internexxus-products-65a8b.appspot.com",
+  messagingSenderId: "788630683314",
+  appId: "1:788630683314:web:ff6a2da1fdfee098e713ab",
+  measurementId: "G-B0JLMBTZWZ"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
-const db = getFirestore(app);  // Initialize Firestore
 
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
@@ -21,7 +25,7 @@ const provider = new GoogleAuthProvider();
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
-const signUpButton = document.getElementById('sign-up-button');
+const signUpButton = document.getElementById('sign-up-button');  // Add this in your HTML for the Sign-Up Button
 const uploadBox = document.getElementById('upload-box');
 const uploadButton = document.getElementById('upload-button');
 const resumeUpload = document.getElementById('resume-upload');
@@ -29,10 +33,10 @@ const loginModal = document.getElementById('login-modal');
 const signupModal = document.getElementById('signup-modal');
 const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
-const loginButton = document.getElementById('login-button');
-const signupButton = document.getElementById('signup-button');
-const emailInput = document.getElementById('login-email');
-const passwordInput = document.getElementById('login-password');
+const loginButton = document.getElementById('login-button'); 
+const signupButton = document.getElementById('signup-button');  // Sign-Up button for email/password
+const emailInput = document.querySelector('input[type="text"]');
+const passwordInput = document.querySelector('input[type="password"]');
 const signupEmail = document.getElementById('signup-email');
 const signupPassword = document.getElementById('signup-password');
 
@@ -44,34 +48,12 @@ signInButton.addEventListener('click', () => {
     }, 10);
 });
 
-// Show sign up modal
+// Show sign-up modal
 signUpButton.addEventListener('click', () => {
     signupModal.style.display = 'flex';
     setTimeout(() => {
         signupModal.classList.add('show');
     }, 10);
-});
-
-// Show sign up modal when clicking "Sign Up" in login modal
-document.getElementById('sign-up-link').addEventListener('click', () => {
-    loginModal.classList.remove('show');
-    setTimeout(() => {
-        loginModal.style.display = 'none';
-        signupModal.style.display = 'flex';
-        setTimeout(() => {
-            signupModal.classList.add('show');
-        }, 10);
-    }, 300);
-});
-
-// Close login/signup modal
-closeButton.addEventListener('click', () => {
-    loginModal.classList.remove('show');
-    signupModal.classList.remove('show');
-    setTimeout(() => {
-        loginModal.style.display = 'none';
-        signupModal.style.display = 'none';
-    }, 300);
 });
 
 // Handle Google Sign-In from modal
@@ -157,12 +139,9 @@ function checkAuthenticationBeforeUpload() {
             loginModal.classList.add('show');
         }, 10);
     } else {
-        // If user is authenticated, trigger the file input click
         resumeUpload.click();
     }
 }
-
-uploadButton.addEventListener('click', checkAuthenticationBeforeUpload);
 
 // Drag and Drop functionality with authentication check
 uploadBox.addEventListener('dragover', (e) => {
@@ -219,7 +198,6 @@ function handleFileUpload(file) {
             console.error('File upload error:', error);
         });
 }
-
 // Show Job Description Input
 function showJobDescriptionInput() {
     uploadBox.innerHTML = '';
