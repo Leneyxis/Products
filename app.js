@@ -149,16 +149,25 @@ signOutButton.addEventListener('click', () => {
         });
 });
 
+// Listen for changes in the auth state (e.g., sign in, sign out)
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is signed in
+        toggleUI(true);
+    } else {
+        // User is signed out
+        toggleUI(false);
+    }
+});
+
 // Toggle UI based on user auth state
 function toggleUI(isSignedIn) {
     if (isSignedIn) {
-        signInButton.style.display = 'none';
-        signOutButton.style.display = 'block';
-        uploadBox.style.display = 'block'; // Keep upload box visible
+        signInButton.style.display = 'none';  // Hide sign in button
+        signOutButton.style.display = 'block'; // Show sign out button
     } else {
-        signInButton.style.display = 'block';
-        signOutButton.style.display = 'none';
-        uploadBox.style.display = 'block'; // Keep upload box visible even when signed out
+        signInButton.style.display = 'block'; // Show sign in button
+        signOutButton.style.display = 'none';  // Hide sign out button
     }
 }
 
