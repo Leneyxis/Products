@@ -320,11 +320,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Toggle UI based on user auth state
-onAuthStateChanged(auth, user => {
-    if (user) {
-        toggleUI(true);
+function toggleUI(isSignedIn) {
+    if (isSignedIn) {
+        signInButton.style.display = 'none';
+        signOutButton.style.display = 'block';
+        // The upload box should always be visible regardless of auth state
     } else {
-        toggleUI(false);
+        signInButton.style.display = 'block';
+        signOutButton.style.display = 'none';
+        // Keep uploadBox visible even when signed out
+    }
+}
+
+// Prevent upload if not signed in
+uploadButton.addEventListener('click', () => {
+    const user = auth.currentUser;
+    if (!user) {
+        // If user is not signed in, trigger the login modal
+        loginModal.style.display = 'flex';
+        loginModal.classList.add('show');
+    } else {
+        // If signed in, trigger the file upload
+        resumeUpload.click();
     }
 });
 
