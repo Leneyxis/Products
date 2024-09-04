@@ -583,6 +583,64 @@ footer {
     /* Adjust any other sections based on need */
 }
 
+/* Styles for tablet devices (iPad, etc.) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .hero-content {
+        flex-direction: row; /* Keep the layout in row direction */
+        align-items: center; /* Ensure proper alignment */
+        padding: 20px 20px; /* Adjust padding for better layout on tablets */
+    }
+
+    .hero img {
+        max-width: 300px; /* Reduce the image size slightly on tablets */
+        margin-right: 30px; /* Ensure space between the image and text */
+        margin-bottom: 0; /* No need for bottom margin in row direction */
+    }
+
+    .hero-text {
+        max-width: 600px; /* Ensure the text doesn’t exceed layout boundaries */
+        text-align: left; /* Align text to the left */
+    }
+
+    .progress-bar {
+        flex-direction: row; /* Keep progress steps in a row layout */
+        margin-top: 20px; /* Add some margin above the progress bar */
+    }
+
+    .upload-box {
+        padding: 20px; /* Add padding for spacing */
+        max-width: 500px; /* Adjust the width of the upload box */
+        margin: 20px auto; /* Center the upload box */
+    }
+
+    .cta {
+        padding: 50px 20px; /* Slight padding adjustment for tablets */
+    }
+
+    .cta h2 {
+        font-size: 30px; /* Adjust font size for the CTA header */
+    }
+
+    .why-use {
+        padding: 20px; /* Padding adjustment for the "Why Use" section */
+    }
+
+    .benefits {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between; /* Distribute benefits evenly */
+        max-width: 100%; /* Ensure benefits section uses full width */
+    }
+
+    .benefit {
+        max-width: 280px; /* Ensure each benefit box doesn't exceed layout */
+        margin-bottom: 20px;
+    }
+
+    /* Adjustments to other sections as needed for tablet view */
+}
+
 
 #login-button, #signup-button {
     width: 100%;
