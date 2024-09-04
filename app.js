@@ -149,10 +149,9 @@ uploadBox.addEventListener('drop', (e) => {
 });
 
 // Upload resume event
-// Upload resume event
 uploadButton.addEventListener('click', () => {
     const user = auth.currentUser;
-    
+
     if (!user) {
         // If the user is not signed in, prompt them to sign in
         alert("Please sign in first to upload your resume.");
@@ -166,6 +165,7 @@ uploadButton.addEventListener('click', () => {
         resumeUpload.click();
     }
 });
+
 
 
 // Handle File Upload
@@ -331,11 +331,11 @@ function toggleUI(isSignedIn) {
     if (isSignedIn) {
         signInButton.style.display = 'none';
         signOutButton.style.display = 'block';
-        uploadBox.style.display = 'block'; // Assuming this is the intended behavior
+        // Keep the upload box always visible, even when not signed in
     } else {
         signInButton.style.display = 'block';
         signOutButton.style.display = 'none';
-        uploadBox.style.display = 'none';
+        // Keep the upload box visible, but don't allow file upload without sign-in
     }
 }
 
