@@ -162,7 +162,7 @@ function toggleUI(isSignedIn) {
     }
 }
 
-// Prevent upload if not signed in
+// Ensure file selection triggers sign-in if the user is not logged in
 uploadButton.addEventListener('click', () => {
     const user = auth.currentUser;
     if (!user) {
