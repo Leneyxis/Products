@@ -149,18 +149,24 @@ uploadBox.addEventListener('drop', (e) => {
 });
 
 // Upload resume event
+// Upload resume event
 uploadButton.addEventListener('click', () => {
-    resumeUpload.click();
-});
-
-resumeUpload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'application/pdf') {
-        handleFileUpload(file);
+    const user = auth.currentUser;
+    
+    if (!user) {
+        // If the user is not signed in, prompt them to sign in
+        alert("Please sign in first to upload your resume.");
+        // Open the login modal
+        loginModal.style.display = 'flex';
+        setTimeout(() => {
+            loginModal.classList.add('show');
+        }, 10);
     } else {
-        alert('Please select a PDF file.');
+        // If the user is signed in, trigger the file input click
+        resumeUpload.click();
     }
 });
+
 
 // Handle File Upload
 function handleFileUpload(file) {
