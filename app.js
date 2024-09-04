@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     generateButton.addEventListener('click', () => {
         if (jobDescriptionInput.value.trim() !== '') {
-            currentStep = 2; // Move to step 2 (generate results)
+            currentStep = 3; // Move to step 2 (generate results)
             updateProgressBar(currentStep);
         }
     });
