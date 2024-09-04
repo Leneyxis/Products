@@ -34,10 +34,10 @@
             </div>
             <form>
                 <div class="input-container">
-                    <input type="text" placeholder="Username" required>
+                    <input type="text" id="login-email" placeholder="Email" required>
                 </div>
                 <div class="input-container">
-                    <input type="password" placeholder="Password" required>
+                    <input type="password" id="login-password" placeholder="Password" required>
                 </div>
                 <button type="button" id="login-button" class="login-btn">Login</button>
                 <div class="forgot-password">
@@ -47,6 +47,32 @@
             <div class="social-login">
                 <p>or</p>
                 <button id="google-sign-in" class="google-sign-in-btn">Sign in with Google</button>
+            </div>
+            <div class="already-have-account">
+                <p>Don't have an account? <a href="#" id="switch-to-signup">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign-Up Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Sign Up</h2>
+            <div class="signup-image">
+                <img src="signup-illustration.png" alt="Sign-Up Illustration">
+            </div>
+            <form>
+                <div class="input-container">
+                    <input type="text" id="signup-email" placeholder="Email" required>
+                </div>
+                <div class="input-container">
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                </div>
+                <button type="button" id="signup-button" class="signup-btn">Sign Up</button>
+            </form>
+            <div class="already-have-account">
+                <p>Already have an account? <a href="#" id="switch-to-login">Log In</a></p>
             </div>
         </div>
     </div>
