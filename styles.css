@@ -219,7 +219,7 @@ nav ul li a {
     background-color: #0056b3;
 }
 
-/* Modal Dialog - Common Styles */
+/* Modal Dialog */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -276,15 +276,6 @@ nav ul li a {
     cursor: pointer;
 }
 
-/* Login Modal */
-.modal-content.login {
-    background-color: #fefefe;
-}
-
-.modal-content.signup {
-    background-color: #f3f9f6; /* Slight difference for sign-up modal */
-}
-
 .modal-content h2 {
     margin-bottom: 20px;
     font-size: 24px;
@@ -322,8 +313,7 @@ nav ul li a {
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Login and Signup Button Styles */
-.login-btn, .signup-btn {
+.login-btn {
     background-color: #000;
     color: white;
     padding: 10px 20px;
@@ -335,12 +325,21 @@ nav ul li a {
     font-size: 16px;
 }
 
-.login-btn:hover,
-.signup-btn:hover {
+.login-btn:hover {
     background-color: #333;
 }
 
-/* Social Login */
+.forgot-password {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.forgot-password a {
+    color: #000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
 .social-login {
     margin-top: 30px;
 }
@@ -393,6 +392,11 @@ nav ul li a {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Remove dashed border when showing the job description box */
+.job-description-active .upload-box {
+    border: none;
 }
 
 /* Why Use Section */

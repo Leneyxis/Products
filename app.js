@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
@@ -21,39 +21,50 @@ const storage = getStorage(app);
 
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
-
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
-const signUpButton = document.getElementById('sign-up-button');  // Add this in your HTML for the Sign-Up Button
 const uploadBox = document.getElementById('upload-box');
 const uploadButton = document.getElementById('upload-button');
 const resumeUpload = document.getElementById('resume-upload');
 const loginModal = document.getElementById('login-modal');
-const signupModal = document.getElementById('signup-modal');
 const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
-const loginButton = document.getElementById('login-button'); 
-const signupButton = document.getElementById('signup-button');  // Sign-Up button for email/password
-const emailInput = document.querySelector('input[type="text"]');
+const loginButton = document.getElementById('login-button'); // Login button for email/password
+const emailInput = document.querySelector('input[type="text"]'); // Assuming the email input is of type "text"
 const passwordInput = document.querySelector('input[type="password"]');
-const signupEmail = document.getElementById('signup-email');
-const signupPassword = document.getElementById('signup-password');
+
+// API URL
+const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
+
+// Variable to store the download URL
+let uploadedFileUrl = '';
 
 // Show login modal
 signInButton.addEventListener('click', () => {
+    // Reset the modal's display and opacity to ensure it's shown properly
     loginModal.style.display = 'flex';
     setTimeout(() => {
         loginModal.classList.add('show');
-    }, 10);
+    }, 10); // Slight delay to allow CSS transition to work
 });
 
-// Show sign-up modal
-signUpButton.addEventListener('click', () => {
-    signupModal.style.display = 'flex';
+// Close login modal
+closeButton.addEventListener('click', () => {
+    loginModal.classList.remove('show');
     setTimeout(() => {
-        signupModal.classList.add('show');
-    }, 10);
+        loginModal.style.display = 'none';
+    }, 300);  // Wait for the transition to complete before hiding
+});
+
+// Close modal when clicking outside of it
+window.addEventListener('click', (event) => {
+    if (event.target === loginModal) {
+        loginModal.classList.remove('show');
+        setTimeout(() => {
+            loginModal.style.display = 'none';
+        }, 300);  // Wait for the transition to complete before hiding
+    }
 });
 
 // Handle Google Sign-In from modal
@@ -64,7 +75,7 @@ googleSignInButton.addEventListener('click', () => {
             loginModal.classList.remove('show');
             setTimeout(() => {
                 loginModal.style.display = 'none';
-            }, 300);
+            }, 300);  // Wait for the transition to complete before hiding
             toggleUI(true);
         })
         .catch(error => {
@@ -79,38 +90,20 @@ loginButton.addEventListener('click', () => {
 
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
+            // Signed in 
             const user = userCredential.user;
             console.log('User signed in with email:', user);
             loginModal.classList.remove('show');
             setTimeout(() => {
                 loginModal.style.display = 'none';
-            }, 300);
+            }, 300);  // Wait for the transition to complete before hiding
             toggleUI(true);
         })
         .catch((error) => {
-            console.error('Email sign-in error:', error);
-            alert(`Error: ${error.message}`);
-        });
-});
-
-// Handle Email/Password Sign-Up
-signupButton.addEventListener('click', () => {
-    const email = signupEmail.value;
-    const password = signupPassword.value;
-
-    createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log('User signed up:', user);
-            signupModal.classList.remove('show');
-            setTimeout(() => {
-                signupModal.style.display = 'none';
-            }, 300);
-            toggleUI(true);
-        })
-        .catch((error) => {
-            console.error('Email sign-up error:', error);
-            alert(`Error: ${error.message}`);
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Email sign in error:', errorCode, errorMessage);
+            alert(`Error: ${errorMessage}`);
         });
 });
 
@@ -120,6 +113,7 @@ signOutButton.addEventListener('click', () => {
         .then(() => {
             console.log('User signed out');
             toggleUI(false);
+            // Reset the modal's state after signing out
             loginModal.style.display = 'none';
             loginModal.classList.remove('show');
         })
@@ -128,22 +122,7 @@ signOutButton.addEventListener('click', () => {
         });
 });
 
-// Check authentication before allowing file uploads
-function checkAuthenticationBeforeUpload() {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert("Please sign in or sign up to upload your resume.");
-        loginModal.style.display = 'flex';
-        setTimeout(() => {
-            loginModal.classList.add('show');
-        }, 10);
-    } else {
-        resumeUpload.click();
-    }
-}
-
-// Drag and Drop functionality with authentication check
+// Drag and Drop functionality
 uploadBox.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadBox.classList.add('dragover');
@@ -158,21 +137,25 @@ uploadBox.addEventListener('drop', (e) => {
     e.preventDefault();
     uploadBox.classList.remove('dragover');
 
-    const user = auth.currentUser;
-    if (!user) {
-        alert("Please sign in or sign up to upload your resume.");
-        loginModal.style.display = 'flex';
-        setTimeout(() => {
-            loginModal.classList.add('show');
-        }, 10);
-        return;
-    }
-
     const file = e.dataTransfer.files[0];
     if (file && file.type === 'application/pdf') {
         handleFileUpload(file);
     } else {
         alert('Please upload a PDF file.');
+    }
+});
+
+// Upload resume event
+uploadButton.addEventListener('click', () => {
+    resumeUpload.click();
+});
+
+resumeUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+        handleFileUpload(file);
+    } else {
+        alert('Please select a PDF file.');
     }
 });
 
@@ -198,6 +181,7 @@ function handleFileUpload(file) {
             console.error('File upload error:', error);
         });
 }
+
 // Show Job Description Input
 function showJobDescriptionInput() {
     uploadBox.innerHTML = '';
@@ -216,7 +200,7 @@ function showJobDescriptionInput() {
     generateButton.addEventListener('click', () => {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
-            checkPaymentStatusAndGenerate(description);
+            generateCoverLetter(description);
         } else {
             alert('Please enter a job description.');
         }
@@ -252,9 +236,11 @@ function generateCoverLetter(description) {
     .then(response => response.json())
     .then(data => {
         console.log('Success:', data);
+        // Use the fixed Stripe payment URL
         const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145';
 
         if (stripePaymentUrl) {
+            // Redirect to Stripe payment
             redirectToStripePayment(stripePaymentUrl);
         } else {
             alert('Payment URL not available.');
@@ -273,19 +259,16 @@ function redirectToStripePayment(stripeUrl) {
     window.location.href = stripeUrl;
 }
 
-// Handle successful payment and update Firestore
+// Handle successful payment and download
 function handleSuccessfulPayment() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment_status');
     const coverLetterUrl = urlParams.get('cover_letter_url');
-    const user = auth.currentUser;
 
-    if (paymentStatus === 'success' && coverLetterUrl && user) {
+    if (paymentStatus === 'success' && coverLetterUrl) {
         document.getElementById('payment-success').style.display = 'block';
-
-        const userDocRef = doc(db, 'users', user.uid);
-        setDoc(userDocRef, { paymentStatus: 'success' }, { merge: true });
-
+        
+        // Trigger the download
         const link = document.createElement('a');
         link.href = coverLetterUrl;
         link.download = coverLetterUrl.split('/').pop();
@@ -293,29 +276,6 @@ function handleSuccessfulPayment() {
         link.click();
         document.body.removeChild(link);
     }
-}
-
-// Check payment status before generating cover letter
-function checkPaymentStatusAndGenerate(description) {
-    const user = auth.currentUser;
-
-    if (!user) {
-        alert('Please sign in first.');
-        return;
-    }
-
-    const userDocRef = doc(db, 'users', user.uid);
-    getDoc(userDocRef).then((docSnap) => {
-        if (docSnap.exists() && docSnap.data().paymentStatus === 'success') {
-            console.log('User has already paid. Proceeding to generate cover letter.');
-            generateCoverLetter(description);
-        } else {
-            console.log('User has not paid. Redirecting to payment.');
-            redirectToStripePayment('https://buy.stripe.com/9AQ03N36954wbcs145');
-        }
-    }).catch((error) => {
-        console.error('Error checking payment status:', error);
-    });
 }
 
 // Check for successful payment on page load
@@ -336,9 +296,11 @@ function toggleUI(isSignedIn) {
     if (isSignedIn) {
         signInButton.style.display = 'none';
         signOutButton.style.display = 'block';
+        uploadBox.style.display = 'block'; // Assuming this is the intended behavior
     } else {
         signInButton.style.display = 'block';
         signOutButton.style.display = 'none';
+        uploadBox.style.display = 'none';
     }
 }
 
@@ -347,9 +309,11 @@ document.querySelectorAll('.faq-question').forEach(question => {
     question.addEventListener('click', () => {
         const answer = question.nextElementSibling;
         const isVisible = answer.style.display === 'block';
-
+        
+        // Hide all answers
         document.querySelectorAll('.faq-answer').forEach(a => a.style.display = 'none');
-
+        
+        // Toggle current answer
         answer.style.display = isVisible ? 'none' : 'block';
     });
 });
@@ -374,14 +338,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     uploadButton.addEventListener('click', () => {
-        currentStep = 1;
+        currentStep = 1; // Move to step 1 (upload job description)
         updateProgressBar(currentStep);
     });
 
     generateButton.addEventListener('click', () => {
         if (jobDescriptionInput.value.trim() !== '') {
-            currentStep = 2;
+            currentStep = 2; // Move to step 2 (generate results)
             updateProgressBar(currentStep);
         }
     });
+
+    // Optional: Handle any other events that should update the progress bar
 });
