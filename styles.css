@@ -165,61 +165,7 @@ nav ul li a {
     background-color: #0056b3;
 }
 
-.job-section,
-.results-section {
-    border: 1px dashed #007bff;
-    border-radius: 8px;
-    padding: 20px;
-    background-color: #f9fafb;
-}
-
-.job-section h2,
-.results-section h2 {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-.upload-box p {
-    margin: 0 0 20px;
-}
-
-.upload-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#job-description-input {
-    width: 100%;
-    max-width: 600px;
-    height: 200px;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-sizing: border-box;
-    margin-bottom: 20px;
-    resize: none;
-    outline: none;
-}
-
-.generate-button {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.generate-button:hover {
-    background-color: #0056b3;
-}
-
-/* Modal Dialog */
+/* Modal Dialog - Common Styles */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -276,6 +222,15 @@ nav ul li a {
     cursor: pointer;
 }
 
+/* Login Modal */
+.modal-content.login {
+    background-color: #fefefe;
+}
+
+.modal-content.signup {
+    background-color: #f3f9f6; /* Slight difference for sign-up modal */
+}
+
 .modal-content h2 {
     margin-bottom: 20px;
     font-size: 24px;
@@ -313,7 +268,8 @@ nav ul li a {
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
-.login-btn {
+/* Login and Signup Button Styles */
+.login-btn, .signup-btn {
     background-color: #000;
     color: white;
     padding: 10px 20px;
@@ -325,21 +281,12 @@ nav ul li a {
     font-size: 16px;
 }
 
-.login-btn:hover {
+.login-btn:hover,
+.signup-btn:hover {
     background-color: #333;
 }
 
-.forgot-password {
-    margin-top: 10px;
-    text-align: right;
-}
-
-.forgot-password a {
-    color: #000;
-    text-decoration: none;
-    font-size: 14px;
-}
-
+/* Social Login */
 .social-login {
     margin-top: 30px;
 }
@@ -392,150 +339,6 @@ nav ul li a {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-
-/* Remove dashed border when showing the job description box */
-.job-description-active .upload-box {
-    border: none;
-}
-
-/* Why Use Section */
-.why-use {
-    padding: 30px 20px;
-    text-align: center;
-}
-
-.why-use h2 {
-    font-size: 28px;
-    margin-bottom: 15px;
-}
-
-.why-use p {
-    font-size: 16px;
-    margin-bottom: 30px;
-}
-
-/* Features and Benefits */
-.features,
-.benefits {
-    display: flex;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
-}
-
-.feature,
-.benefit {
-    max-width: 280px;
-    text-align: left;
-    margin-bottom: 20px;
-    border: 2px inset rgba(0, 0, 0, 0.088);
-    border-radius: 10px;
-    padding: 15px;
-}
-
-.feature img,
-.benefit img {
-    width: 45px;
-    height: auto;
-    margin-bottom: 15px;
-}
-
-.feature h3,
-.benefit h3 {
-    font-size: 22px;
-    margin-bottom: 8px;
-}
-
-.feature p,
-.benefit p {
-    font-size: 14px;
-}
-
-/* Call to Action Section */
-.cta {
-    background-image: url('backdrop.jpg');
-    background-size: cover;
-    color: black;
-    padding: 60px 20px;
-    text-align: center;
-}
-
-.cta h2 {
-    font-size: 32px;
-    margin-bottom: 20px;
-}
-
-.cta-button {
-    background-color: #9391ea;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-/* FAQ Section */
-.faq {
-    margin: 40px auto;
-    width: 90%;
-    max-width: 1200px;
-    padding: 20px;
-    text-align: justify;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #fff;
-}
-
-.faq-item {
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.faq-item:last-child {
-    border-bottom: none;
-}
-
-.faq-question {
-    font-size: 18px;
-    font-weight: 500;
-    margin: 10px;
-    cursor: pointer;
-    padding: 10px;
-    background-color: #fff;
-    text-align: center;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.faq-question:hover {
-    background-color: #9cb0f3db;
-    border-radius: 5px;
-}
-
-.faq-answer {
-    display: none;
-    padding: 15px;
-    background-color: #fff;
-}
-
-.faq-answer p {
-    margin: 0;
-    font-size: 16px;
-}
-
-.faq-item.active .faq-answer {
-    display: block;
-}
-
-.faq-item.active .faq-question {
-    background-color: #f1f1f1;
-}
-
-footer {
-    padding: 20px 0;
-    text-align: center;
 }
 
 /* Responsive Styles */
