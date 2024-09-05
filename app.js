@@ -326,7 +326,7 @@ async function generateCoverLetter(description) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
-            const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
+            const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145';
 
             if (stripePaymentUrl) {
                 // Redirect to Stripe payment
