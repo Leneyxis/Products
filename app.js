@@ -327,15 +327,19 @@ async function generateCoverLetter(description) {
         .then(data => {
             console.log('Success:', data);
 
-            // Assuming `data` contains the download URL and the Stripe payment URL
-            const downloadUrl = data.download_url; // Capture the cover letter download URL
-            const stripePaymentUrl = data.stripe_url || 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0'; // Payment URL
+            // Parse the body field to get the cover letter URL
+            const parsedBody = JSON.parse(data.body);  // Parse the JSON string in the body
+            const coverLetterUrl = parsedBody.cover_letter_url;  // Extract the cover letter URL
+
+            console.log('Cover Letter URL:', coverLetterUrl);
+
+            const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0'; // Payment URL (replace with actual)
 
             if (stripePaymentUrl) {
-                // Store the download URL for later (after payment)
-                uploadedFileUrl = downloadUrl;
+                // Store the cover letter URL for later (after payment)
+                uploadedFileUrl = coverLetterUrl;
 
-                // Pause for 20 seconds before redirecting to Stripe payment
+                // Pause for 20 seconds to inspect the data and then redirect to Stripe payment
                 setTimeout(() => {
                     console.log('Redirecting to Stripe payment...');
                     redirectToStripePayment(stripePaymentUrl);
@@ -352,6 +356,7 @@ async function generateCoverLetter(description) {
         });
     }
 }
+
 
 
 
