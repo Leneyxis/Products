@@ -327,9 +327,12 @@ function generateCoverLetter(description) {
 // Trigger cover letter download
 function triggerCoverLetterDownload() {
     if (uploadedFileUrl) {
+        // Extract the filename from the URL
+        const fileName = uploadedFileUrl.substring(uploadedFileUrl.lastIndexOf('/') + 1);
+        
         const link = document.createElement('a');
         link.href = uploadedFileUrl;
-        link.download = 'cover_letter.pdf';
+        link.download = fileName;  // Use the extracted filename from the URL
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
