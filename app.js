@@ -341,26 +341,40 @@ function captureCheckoutSessionAndUpdatePayment() {
 
     if (checkoutSessionId) {
         const user = auth.currentUser;
+
         if (!user) {
             alert('Please sign in first.');
             return;
         }
 
         const paymentDocRef = doc(db, 'payments', user.uid);
-        setDoc(paymentDocRef, {
-            payment_status: true,
-            checkout_session_id: checkoutSessionId
-        }, { merge: true })
-        .then(() => {
-            console.log('Payment status updated successfully with session ID:', checkoutSessionId);
-            // Now trigger the cover letter download
-            triggerCoverLetterDownload();
-        })
-        .catch((error) => {
-            console.error('Error updating payment status:', error);
-        });
+
+        // Wait for page to fully load before updating payment status
+        window.onload = async () => {
+            try {
+                await setDoc(paymentDocRef, {
+                    payment_status: true,
+                    checkout_session_id: checkoutSessionId
+                }, { merge: true });
+
+                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
+
+                // Now trigger the cover letter download
+                triggerCoverLetterDownload();
+
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+            }
+        };
+    } else {
+        console.error('No checkout session ID found in the URL.');
     }
 }
+
+// Check for the checkout session and update payment status if successful
+window.addEventListener('load', () => {
+    captureCheckoutSessionAndUpdatePayment();
+});
 
 // Generate Cover Letter and Trigger Download
 function generateCoverLetter(description) {
