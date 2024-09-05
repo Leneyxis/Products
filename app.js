@@ -259,7 +259,7 @@ function handleFileUpload(file) {
         });
 }
 
-// Show Job Description Input
+// Show Job Description Input and Start Process
 function showJobDescriptionInput() {
     uploadBox.innerHTML = '';
     uploadBox.classList.add('job-description-active');
@@ -278,21 +278,92 @@ function showJobDescriptionInput() {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
             updateProgressBar(2);  // Move to step 3 on Generate button click
-            checkPaymentStatusAndProceed(description);  // Check payment and proceed with cover letter generation
+            generateCoverLetterAndCheckPayment(description);  // Generate cover letter first, then handle payment
         } else {
             alert('Please enter a job description.');
         }
     });
 }
 
-// Function to show loader
-function showLoader() {
-    document.getElementById('loader').style.display = 'flex';
+// Generate Cover Letter and Trigger Payment Flow or Download
+function generateCoverLetterAndCheckPayment(description) {
+    showLoader();
+
+    const requestData = {
+        link: uploadedFileUrl,
+        job_description: description
+    };
+
+    // First, generate the cover letter
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Cover letter generation success:', data);
+
+        const parsedBody = JSON.parse(data.body);  // Parse the response body
+        const coverLetterUrl = parsedBody.cover_letter_url;  // Extract cover letter URL
+
+        if (coverLetterUrl) {
+            uploadedFileUrl = coverLetterUrl;  // Store the URL for later use
+            // Now check payment status after generating the cover letter
+            checkPaymentStatusAndProceed();
+        } else {
+            console.error('Cover letter URL not found.');
+            alert('Error generating cover letter. Please try again.');
+        }
+    })
+    .catch((error) => {
+        console.error('Error generating cover letter:', error);
+        alert('Failed to generate cover letter.');
+    })
+    .finally(() => {
+        hideLoader();
+    });
 }
 
-// Function to hide loader
-function hideLoader() {
-    document.getElementById('loader').style.display = 'none';
+// Check payment status and either proceed to payment or download cover letter
+async function checkPaymentStatusAndProceed() {
+    const user = auth.currentUser;
+    if (!user) {
+        alert('Please sign in first.');
+        return;
+    }
+
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (paymentDocSnap.exists()) {
+        const paymentData = paymentDocSnap.data();
+        if (paymentData.payment_status === false) {
+            // Redirect to Stripe for payment
+            window.location.href = stripePaymentUrl;
+        } else {
+            // If already paid, trigger the download of the cover letter
+            triggerCoverLetterDownload();
+        }
+    } else {
+        alert('Error: Payment record not found.');
+    }
+}
+
+// Trigger cover letter download
+function triggerCoverLetterDownload() {
+    if (uploadedFileUrl) {
+        const link = document.createElement('a');
+        link.href = uploadedFileUrl;
+        link.download = 'AI_cover_letter.pdf';  // Rename the file to AI_cover_letter.pdf
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        console.error('No cover letter URL found for download.');
+    }
 }
 
 // Check if the payment record exists and create one if it doesn't
@@ -309,123 +380,14 @@ async function checkAndCreatePaymentRecord(user) {
     }
 }
 
-// Check payment status and either proceed to payment or generate cover letter
-async function checkPaymentStatusAndProceed(jobDescription) {
-    const user = auth.currentUser;
-    if (!user) {
-        alert('Please sign in first.');
-        return;
-    }
-
-    const paymentDocRef = doc(db, 'payments', user.uid);
-    const paymentDocSnap = await getDoc(paymentDocRef);
-
-    if (paymentDocSnap.exists()) {
-        const paymentData = paymentDocSnap.data();
-        if (paymentData.payment_status === false) {
-            // Redirect to Stripe for payment
-            window.location.href = stripePaymentUrl;
-        } else {
-            // If already paid, generate and download cover letter
-            generateCoverLetter(jobDescription);
-        }
-    } else {
-        alert('Error: Payment record not found.');
-    }
+// Show loader
+function showLoader() {
+    document.getElementById('loader').style.display = 'flex';
 }
 
-// Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
-function captureCheckoutSessionAndUpdatePayment(user) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const checkoutSessionId = urlParams.get('id');
-
-    if (checkoutSessionId) {
-        const paymentDocRef = doc(db, 'payments', user.uid);
-
-        // Wait for 5 seconds after page load before updating payment status
-        setTimeout(async () => {
-            try {
-                // Update Firestore with payment status and session ID after 5 seconds
-                await setDoc(paymentDocRef, {
-                    payment_status: true,
-                    checkout_session_id: checkoutSessionId
-                }, { merge: true });
-
-                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
-
-                // Now trigger the cover letter download
-                triggerCoverLetterDownload();
-
-            } catch (error) {
-                console.error('Error updating payment status:', error);
-            }
-        }, 5000); // 5000 ms = 5 seconds
-    } else {
-        console.error('No checkout session ID found in the URL.');
-    }
-}
-
-// Wait until Firebase restores the user's authentication state after page reload
-window.addEventListener('load', () => {
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // Once the user is authenticated, proceed with checking the session ID and updating the payment status
-            captureCheckoutSessionAndUpdatePayment(user);
-        } else {
-            console.error('User is not signed in.');
-        }
-    });
-});
-
-
-// Generate Cover Letter and Trigger Download
-function generateCoverLetter(description) {
-    showLoader();
-
-    const requestData = {
-        link: uploadedFileUrl,
-        job_description: description
-    };
-
-    fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-
-        const parsedBody = JSON.parse(data.body);  // Parse the response body
-        const coverLetterUrl = parsedBody.cover_letter_url;  // Extract cover letter URL
-
-        uploadedFileUrl = coverLetterUrl;  // Store for later use
-
-        // Trigger the download directly
-        triggerCoverLetterDownload();
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        hideLoader();
-    });
-}
-
-// Trigger cover letter download
-function triggerCoverLetterDownload() {
-    if (uploadedFileUrl) {
-        const link = document.createElement('a');
-        link.href = uploadedFileUrl;
-        link.download = 'AI_cover_letter.pdf';  // Rename the file to AI_cover_letter.pdf
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } else {
-        console.error('No cover letter URL found for download.');
-    }
+// Hide loader
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
 }
 
 // Function to update the progress bar
@@ -452,8 +414,3 @@ document.querySelectorAll('.faq-question').forEach(question => {
         answer.style.display = isVisible ? 'none' : 'block';
     });
 });
-
-// Check for the checkout session and update payment status if successful
-window.onload = () => {
-    captureCheckoutSessionAndUpdatePayment();
-};
