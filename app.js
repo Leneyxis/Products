@@ -335,8 +335,11 @@ async function generateCoverLetter(description) {
                 // Store the download URL for later (after payment)
                 uploadedFileUrl = downloadUrl;
 
-                // Redirect to Stripe payment
-                redirectToStripePayment(stripePaymentUrl);
+                // Pause for 20 seconds before redirecting to Stripe payment
+                setTimeout(() => {
+                    console.log('Redirecting to Stripe payment...');
+                    redirectToStripePayment(stripePaymentUrl);
+                }, 20000); // 20 seconds delay
             } else {
                 alert('Payment URL not available.');
             }
@@ -349,6 +352,7 @@ async function generateCoverLetter(description) {
         });
     }
 }
+
 
 
 // Redirect to Stripe payment
