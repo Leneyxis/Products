@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -127,10 +127,6 @@ signupButton.addEventListener('click', () => {
         .then((userCredential) => {
             const user = userCredential.user;
             console.log('User signed up:', user);
-            
-            // Set initial payment status to false in Firestore
-            const userRef = doc(db, 'users', user.uid);
-            setDoc(userRef, { payment_status: false });
             
             toggleUI(true);
             loginModal.style.display = 'none'; // Hide modal after sign-up
@@ -275,7 +271,7 @@ function showJobDescriptionInput() {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
             updateProgressBar(2);  // Move to step 3 on Generate button click
-            checkPaymentStatusAndProceed(description);  // Check payment status before generating cover letter
+            generateCoverLetter(description);  // Generate cover letter
         } else {
             alert('Please enter a job description.');
         }
@@ -292,30 +288,8 @@ function hideLoader() {
     document.getElementById('loader').style.display = 'none';
 }
 
-// Check payment status and proceed
-function checkPaymentStatusAndProceed(description) {
-    const user = auth.currentUser;
-    const userRef = doc(db, 'users', user.uid);
-
-    // Check payment status from Firestore
-    getDoc(userRef).then((docSnapshot) => {
-        if (docSnapshot.exists()) {
-            const paymentStatus = docSnapshot.data().payment_status;
-            if (paymentStatus) {
-                // If payment_status is true, directly generate the cover letter and download
-                generateCoverLetter(description, true);  // Pass true to bypass payment
-            } else {
-                // If payment_status is false, proceed to payment
-                generateCoverLetter(description, false);  // Pass false to require payment
-            }
-        }
-    }).catch((error) => {
-        console.error("Error reading payment status from Firestore:", error);
-    });
-}
-
-// Generate Cover Letter and Redirect to Payment
-function generateCoverLetter(description, bypassPayment) {
+// Generate Cover Letter and Trigger Download
+function generateCoverLetter(description) {
     showLoader();
 
     const requestData = {
@@ -339,14 +313,8 @@ function generateCoverLetter(description, bypassPayment) {
 
         uploadedFileUrl = coverLetterUrl;  // Store for later use
 
-        if (bypassPayment) {
-            // If payment was already made, trigger the download directly
-            triggerCoverLetterDownload();
-        } else {
-            // Otherwise, redirect to Stripe payment
-            const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
-            redirectToStripePayment(stripePaymentUrl);
-        }
+        // Trigger the download directly
+        triggerCoverLetterDownload();
     })
     .catch((error) => {
         console.error('Error:', error);
@@ -354,27 +322,6 @@ function generateCoverLetter(description, bypassPayment) {
     .finally(() => {
         hideLoader();
     });
-}
-
-// Function to redirect to Stripe payment
-function redirectToStripePayment(stripeUrl) {
-    window.location.href = stripeUrl;
-}
-
-// Handle successful payment and update status
-async function handleSuccessfulPayment() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const checkoutSessionId = urlParams.get('id');
-
-    if (checkoutSessionId) {
-        const user = auth.currentUser;
-        const userRef = doc(db, 'users', user.uid);
-
-        // Update payment status to true in Firestore
-        await updateDoc(userRef, { payment_status: true });
-
-        triggerCoverLetterDownload();
-    }
 }
 
 // Trigger cover letter download
@@ -390,11 +337,6 @@ function triggerCoverLetterDownload() {
         console.error('No cover letter URL found for download.');
     }
 }
-
-// Check for successful payment on page load
-document.addEventListener('DOMContentLoaded', () => {
-    handleSuccessfulPayment();
-});
 
 // Function to update the progress bar
 function updateProgressBar(stepIndex) {
