@@ -114,7 +114,7 @@ loginButton.addEventListener('click', () => {
             const errorCode = error.code;
             const errorMessage = error.message;
             console.error('Email sign in error:', errorCode, errorMessage);
-            alert(Error: ${errorMessage});
+            alert(`Error: ${errorMessage}`);
         });
 });
 
@@ -135,7 +135,7 @@ signupButton.addEventListener('click', () => {
             const errorCode = error.code;
             const errorMessage = error.message;
             console.error('Sign up error:', errorCode, errorMessage);
-            alert(Sign up failed: ${errorMessage});
+            alert(`Sign up failed: ${errorMessage}`);
         });
 });
 
@@ -234,7 +234,7 @@ function handleFileUpload(file) {
 
     showLoader();  // Show loader while uploading
 
-    const storageRef = ref(storage, resumes/${user.uid}/${file.name});
+    const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
     uploadBytes(storageRef, file)
         .then((snapshot) => {
             console.log('File uploaded successfully');
