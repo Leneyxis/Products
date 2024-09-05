@@ -311,6 +311,11 @@ function generateCoverLetterAndCheckPayment(description) {
 
         if (coverLetterUrl) {
             uploadedFileUrl = coverLetterUrl;  // Store the URL for later use
+            console.log('Cover letter URL:', uploadedFileUrl);
+
+            // Store the cover letter URL in the user's payment JSON in Firestore
+            storeCoverLetterUrlInPaymentJson(coverLetterUrl);
+
             // Now check payment status after generating the cover letter
             checkPaymentStatusAndProceed();
         } else {
@@ -325,6 +330,18 @@ function generateCoverLetterAndCheckPayment(description) {
     .finally(() => {
         hideLoader();
     });
+}
+
+// Store Cover Letter URL in Firestore payment JSON
+async function storeCoverLetterUrlInPaymentJson(coverLetterUrl) {
+    const user = auth.currentUser;
+    const paymentDocRef = doc(db, 'payments', user.uid);
+
+    await setDoc(paymentDocRef, {
+        cover_letter_url: coverLetterUrl
+    }, { merge: true });
+
+    console.log('Cover letter URL stored in Firestore payment JSON.');
 }
 
 // Check payment status and either proceed to payment or download cover letter
@@ -344,11 +361,32 @@ async function checkPaymentStatusAndProceed() {
             // Redirect to Stripe for payment
             window.location.href = stripePaymentUrl;
         } else {
-            // If already paid, trigger the download of the cover letter
-            triggerCoverLetterDownload();
+            // If already paid, retrieve cover letter URL and trigger download
+            fetchCoverLetterUrlAndDownload();
         }
     } else {
         alert('Error: Payment record not found.');
+    }
+}
+
+// Fetch Cover Letter URL from Firestore and Trigger Download
+async function fetchCoverLetterUrlAndDownload() {
+    const user = auth.currentUser;
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (paymentDocSnap.exists()) {
+        const paymentData = paymentDocSnap.data();
+        const coverLetterUrl = paymentData.cover_letter_url;
+
+        if (coverLetterUrl) {
+            uploadedFileUrl = coverLetterUrl;
+            triggerCoverLetterDownload();
+        } else {
+            console.error('Cover letter URL not found in payment JSON.');
+        }
+    } else {
+        console.error('No payment record found.');
     }
 }
 
@@ -363,20 +401,6 @@ function triggerCoverLetterDownload() {
         document.body.removeChild(link);
     } else {
         console.error('No cover letter URL found for download.');
-    }
-}
-
-// Check if the payment record exists and create one if it doesn't
-async function checkAndCreatePaymentRecord(user) {
-    const paymentDocRef = doc(db, 'payments', user.uid);
-    const paymentDocSnap = await getDoc(paymentDocRef);
-
-    if (!paymentDocSnap.exists()) {
-        // Create a payment record with payment_status = false
-        await setDoc(paymentDocRef, { payment_status: false });
-        console.log('Created new payment record for user:', user.uid);
-    } else {
-        console.log('Payment record already exists for user:', user.uid);
     }
 }
 
@@ -406,8 +430,8 @@ function captureCheckoutSessionAndUpdatePayment() {
 
                 console.log('Payment status updated successfully with session ID:', checkoutSessionId);
 
-                // Now trigger the cover letter download
-                triggerCoverLetterDownload();
+                // Fetch the cover letter URL from Firestore and trigger download
+                fetchCoverLetterUrlAndDownload();
 
             } catch (error) {
                 console.error('Error updating payment status:', error);
@@ -429,6 +453,20 @@ window.addEventListener('load', () => {
         }
     });
 });
+
+// Check if the payment record exists and create one if it doesn't
+async function checkAndCreatePaymentRecord(user) {
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (!paymentDocSnap.exists()) {
+        // Create a payment record with payment_status = false
+        await setDoc(paymentDocRef, { payment_status: false });
+        console.log('Created new payment record for user:', user.uid);
+    } else {
+        console.log('Payment record already exists for user:', user.uid);
+    }
+}
 
 // Show loader
 function showLoader() {
