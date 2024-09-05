@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, getBytes } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -127,6 +127,11 @@ signupButton.addEventListener('click', () => {
         .then((userCredential) => {
             const user = userCredential.user;
             console.log('User signed up:', user);
+            
+            // Set initial payment status to false in Firestore
+            const userRef = doc(db, 'users', user.uid);
+            setDoc(userRef, { payment_status: false });
+            
             toggleUI(true);
             loginModal.style.display = 'none'; // Hide modal after sign-up
         })
@@ -242,7 +247,6 @@ function handleFileUpload(file) {
         .then((url) => {
             uploadedFileUrl = url;
             hideLoader();  // Hide loader after upload
-            createPaymentStatusFileIfNotExists(user.uid);  // Ensure payment status file exists
             updateProgressBar(1);  // Move to step 2 when file upload is done
             showJobDescriptionInput();  // Proceed to show job description input
         })
@@ -250,23 +254,6 @@ function handleFileUpload(file) {
             hideLoader();  // Hide loader if there’s an error
             console.error('File upload error:', error);
         });
-}
-
-// Create payment status file if it doesn't already exist
-function createPaymentStatusFileIfNotExists(userId) {
-    const paymentStatusFileRef = ref(storage, `resumes/${userId}/payment_status.json`);
-
-    getBytes(paymentStatusFileRef).catch((error) => {
-        if (error.code === 'storage/object-not-found') {
-            // If file doesn't exist, create it with initial payment_status: false
-            const paymentStatusData = JSON.stringify({ payment_status: false });
-            uploadBytes(paymentStatusFileRef, new Blob([paymentStatusData], { type: 'application/json' }))
-                .then(() => console.log('Payment status file created'))
-                .catch(err => console.error('Error creating payment status file:', err));
-        } else {
-            console.error('Error checking for payment status file:', error);
-        }
-    });
 }
 
 // Show Job Description Input
@@ -308,18 +295,20 @@ function hideLoader() {
 // Check payment status and proceed
 function checkPaymentStatusAndProceed(description) {
     const user = auth.currentUser;
-    const paymentStatusFileRef = ref(storage, `resumes/${user.uid}/payment_status.json`);
+    const userRef = doc(db, 'users', user.uid);
 
-    // Check payment status from the "payment_status.json" file
-    getBytes(paymentStatusFileRef).then((bytes) => {
-        const paymentStatusData = JSON.parse(new TextDecoder().decode(bytes));
-        if (paymentStatusData.payment_status) {
-            triggerCoverLetterDownload();
-        } else {
-            generateCoverLetter(description);
+    // Check payment status from Firestore
+    getDoc(userRef).then((docSnapshot) => {
+        if (docSnapshot.exists()) {
+            const paymentStatus = docSnapshot.data().payment_status;
+            if (paymentStatus) {
+                triggerCoverLetterDownload();
+            } else {
+                generateCoverLetter(description);
+            }
         }
     }).catch((error) => {
-        console.error("Error reading payment status file:", error);
+        console.error("Error reading payment status from Firestore:", error);
     });
 }
 
@@ -377,11 +366,10 @@ async function handleSuccessfulPayment() {
 
     if (checkoutSessionId) {
         const user = auth.currentUser;
-        const paymentStatusFileRef = ref(storage, `resumes/${user.uid}/payment_status.json`);
+        const userRef = doc(db, 'users', user.uid);
 
-        // Update payment status to true in the "payment_status.json" file
-        const paymentStatusData = JSON.stringify({ payment_status: true });
-        await uploadBytes(paymentStatusFileRef, new Blob([paymentStatusData], { type: 'application/json' }));
+        // Update payment status to true in Firestore
+        await updateDoc(userRef, { payment_status: true });
 
         triggerCoverLetterDownload();
     }
