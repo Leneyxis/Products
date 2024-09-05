@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, getBytes } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
@@ -127,8 +127,10 @@ signupButton.addEventListener('click', () => {
         .then((userCredential) => {
             const user = userCredential.user;
             console.log('User signed up:', user);
-            // Set initial payment status to false in Firestore
-            setDoc(doc(db, 'users', user.uid), { payment_status: false });
+            // Set initial payment status to false in a "payment_status.json" file in Firebase Storage
+            const paymentStatusFileRef = ref(storage, `resumes/${user.uid}/payment_status.json`);
+            const paymentStatusData = JSON.stringify({ payment_status: false });
+            uploadBytes(paymentStatusFileRef, new Blob([paymentStatusData], { type: 'application/json' }));
             toggleUI(true);
             loginModal.style.display = 'none'; // Hide modal after sign-up
         })
@@ -292,17 +294,18 @@ function hideLoader() {
 // Check payment status and proceed
 function checkPaymentStatusAndProceed(description) {
     const user = auth.currentUser;
-    const userRef = doc(db, 'users', user.uid);
+    const paymentStatusFileRef = ref(storage, `resumes/${user.uid}/payment_status.json`);
 
-    getDoc(userRef).then((docSnapshot) => {
-        if (docSnapshot.exists()) {
-            const paymentStatus = docSnapshot.data().payment_status;
-            if (paymentStatus) {
-                triggerCoverLetterDownload();
-            } else {
-                generateCoverLetter(description);
-            }
+    // Check payment status from the "payment_status.json" file
+    getBytes(paymentStatusFileRef).then((bytes) => {
+        const paymentStatusData = JSON.parse(new TextDecoder().decode(bytes));
+        if (paymentStatusData.payment_status) {
+            triggerCoverLetterDownload();
+        } else {
+            generateCoverLetter(description);
         }
+    }).catch((error) => {
+        console.error("Error reading payment status file:", error);
     });
 }
 
@@ -360,10 +363,12 @@ async function handleSuccessfulPayment() {
 
     if (checkoutSessionId) {
         const user = auth.currentUser;
-        const userRef = doc(db, 'users', user.uid);
+        const paymentStatusFileRef = ref(storage, `resumes/${user.uid}/payment_status.json`);
 
-        // Update payment status to true
-        await updateDoc(userRef, { payment_status: true });
+        // Update payment status to true in the "payment_status.json" file
+        const paymentStatusData = JSON.stringify({ payment_status: true });
+        await uploadBytes(paymentStatusFileRef, new Blob([paymentStatusData], { type: 'application/json' }));
+
         triggerCoverLetterDownload();
     }
 }
