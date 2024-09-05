@@ -311,11 +311,8 @@ function generateCoverLetterAndCheckPayment(description) {
 
         if (coverLetterUrl) {
             uploadedFileUrl = coverLetterUrl;  // Store the URL for later use
-            console.log('Cover letter URL:', uploadedFileUrl);
-
-            // Store the cover letter URL in the user's payment JSON in Firestore
-            storeCoverLetterUrlInPaymentJson(coverLetterUrl);
-
+            // Now store the cover letter URL in Firestore for retrieval later
+            storeCoverLetterUrlInFirestore(coverLetterUrl);
             // Now check payment status after generating the cover letter
             checkPaymentStatusAndProceed();
         } else {
@@ -332,16 +329,16 @@ function generateCoverLetterAndCheckPayment(description) {
     });
 }
 
-// Store Cover Letter URL in Firestore payment JSON
-async function storeCoverLetterUrlInPaymentJson(coverLetterUrl) {
+// Store Cover Letter URL in Firestore for later retrieval
+async function storeCoverLetterUrlInFirestore(coverLetterUrl) {
     const user = auth.currentUser;
-    const paymentDocRef = doc(db, 'payments', user.uid);
+    const coverLetterDocRef = doc(db, 'cover_letters', user.uid);
 
-    await setDoc(paymentDocRef, {
+    await setDoc(coverLetterDocRef, {
         cover_letter_url: coverLetterUrl
     }, { merge: true });
 
-    console.log('Cover letter URL stored in Firestore payment JSON.');
+    console.log('Cover letter URL stored in Firestore.');
 }
 
 // Check payment status and either proceed to payment or download cover letter
@@ -361,7 +358,7 @@ async function checkPaymentStatusAndProceed() {
             // Redirect to Stripe for payment
             window.location.href = stripePaymentUrl;
         } else {
-            // If already paid, retrieve cover letter URL and trigger download
+            // If already paid, fetch the cover letter URL from Firestore and download
             fetchCoverLetterUrlAndDownload();
         }
     } else {
@@ -372,21 +369,16 @@ async function checkPaymentStatusAndProceed() {
 // Fetch Cover Letter URL from Firestore and Trigger Download
 async function fetchCoverLetterUrlAndDownload() {
     const user = auth.currentUser;
-    const paymentDocRef = doc(db, 'payments', user.uid);
-    const paymentDocSnap = await getDoc(paymentDocRef);
+    const coverLetterDocRef = doc(db, 'cover_letters', user.uid);
+    const coverLetterDocSnap = await getDoc(coverLetterDocRef);
 
-    if (paymentDocSnap.exists()) {
-        const paymentData = paymentDocSnap.data();
-        const coverLetterUrl = paymentData.cover_letter_url;
+    if (coverLetterDocSnap.exists()) {
+        const coverLetterData = coverLetterDocSnap.data();
+        uploadedFileUrl = coverLetterData.cover_letter_url;
 
-        if (coverLetterUrl) {
-            uploadedFileUrl = coverLetterUrl;
-            triggerCoverLetterDownload();
-        } else {
-            console.error('Cover letter URL not found in payment JSON.');
-        }
+        triggerCoverLetterDownload();
     } else {
-        console.error('No payment record found.');
+        console.error('No cover letter URL found in Firestore.');
     }
 }
 
