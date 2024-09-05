@@ -380,6 +380,56 @@ async function checkAndCreatePaymentRecord(user) {
     }
 }
 
+// Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
+function captureCheckoutSessionAndUpdatePayment() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutSessionId = urlParams.get('id');
+
+    if (checkoutSessionId) {
+        const user = auth.currentUser;
+
+        if (!user) {
+            alert('Please sign in first.');
+            return;
+        }
+
+        const paymentDocRef = doc(db, 'payments', user.uid);
+
+        // Immediately store payment info and trigger download
+        setTimeout(async () => {
+            try {
+                // Update Firestore with payment status and session ID
+                await setDoc(paymentDocRef, {
+                    payment_status: true,
+                    checkout_session_id: checkoutSessionId
+                }, { merge: true });
+
+                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
+
+                // Now trigger the cover letter download
+                triggerCoverLetterDownload();
+
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+            }
+        }, 1000); // Adding a small delay just for better UX
+    } else {
+        console.error('No checkout session ID found in the URL.');
+    }
+}
+
+// Check for the checkout session and update payment status if successful
+window.addEventListener('load', () => {
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Once the user is authenticated, proceed with checking the session ID and updating the payment status
+            captureCheckoutSessionAndUpdatePayment(user);
+        } else {
+            console.error('User is not signed in.');
+        }
+    });
+});
+
 // Show loader
 function showLoader() {
     document.getElementById('loader').style.display = 'flex';
