@@ -311,6 +311,8 @@ function generateCoverLetterAndCheckPayment(description) {
 
         if (coverLetterUrl) {
             uploadedFileUrl = coverLetterUrl;  // Store the URL for later use
+            console.log('Cover letter URL:', uploadedFileUrl);
+
             // Now check payment status after generating the cover letter
             checkPaymentStatusAndProceed();
         } else {
@@ -325,6 +327,48 @@ function generateCoverLetterAndCheckPayment(description) {
     .finally(() => {
         hideLoader();
     });
+}
+
+// Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
+function captureCheckoutSessionAndUpdatePayment() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutSessionId = urlParams.get('id');
+
+    if (checkoutSessionId) {
+        const user = auth.currentUser;
+
+        if (!user) {
+            alert('Please sign in first.');
+            return;
+        }
+
+        const paymentDocRef = doc(db, 'payments', user.uid);
+
+        // Immediately store payment info and trigger download
+        setTimeout(async () => {
+            try {
+                // Update Firestore with payment status and session ID
+                await setDoc(paymentDocRef, {
+                    payment_status: true,
+                    checkout_session_id: checkoutSessionId
+                }, { merge: true });
+
+                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
+
+                // Now trigger the cover letter download, only if uploadedFileUrl is set
+                if (uploadedFileUrl) {
+                    triggerCoverLetterDownload();
+                } else {
+                    console.error('Cover letter URL not available at the time of download.');
+                }
+
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+            }
+        }, 1000); // Adding a small delay just for better UX
+    } else {
+        console.error('No checkout session ID found in the URL.');
+    }
 }
 
 // Check payment status and either proceed to payment or download cover letter
@@ -363,58 +407,6 @@ function triggerCoverLetterDownload() {
         document.body.removeChild(link);
     } else {
         console.error('No cover letter URL found for download.');
-    }
-}
-
-// Check if the payment record exists and create one if it doesn't
-async function checkAndCreatePaymentRecord(user) {
-    const paymentDocRef = doc(db, 'payments', user.uid);
-    const paymentDocSnap = await getDoc(paymentDocRef);
-
-    if (!paymentDocSnap.exists()) {
-        // Create a payment record with payment_status = false
-        await setDoc(paymentDocRef, { payment_status: false });
-        console.log('Created new payment record for user:', user.uid);
-    } else {
-        console.log('Payment record already exists for user:', user.uid);
-    }
-}
-
-// Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
-function captureCheckoutSessionAndUpdatePayment() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const checkoutSessionId = urlParams.get('id');
-
-    if (checkoutSessionId) {
-        const user = auth.currentUser;
-
-        if (!user) {
-            alert('Please sign in first.');
-            return;
-        }
-
-        const paymentDocRef = doc(db, 'payments', user.uid);
-
-        // Immediately store payment info and trigger download
-        setTimeout(async () => {
-            try {
-                // Update Firestore with payment status and session ID
-                await setDoc(paymentDocRef, {
-                    payment_status: true,
-                    checkout_session_id: checkoutSessionId
-                }, { merge: true });
-
-                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
-
-                // Now trigger the cover letter download
-                triggerCoverLetterDownload();
-
-            } catch (error) {
-                console.error('Error updating payment status:', error);
-            }
-        }, 1000); // Adding a small delay just for better UX
-    } else {
-        console.error('No checkout session ID found in the URL.');
     }
 }
 
