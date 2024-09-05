@@ -357,9 +357,6 @@ async function generateCoverLetter(description) {
     }
 }
 
-
-
-
 // Redirect to Stripe payment
 function redirectToStripePayment(stripeUrl) {
     window.location.href = stripeUrl;
@@ -400,12 +397,16 @@ async function handleSuccessfulPayment() {
 
 // Trigger the cover letter download
 function triggerCoverLetterDownload() {
-    const link = document.createElement('a');
-    link.href = uploadedFileUrl;  // Use the previously stored file URL
-    link.download = 'cover_letter.pdf'; // Default download filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (uploadedFileUrl) {
+        const link = document.createElement('a');
+        link.href = uploadedFileUrl;  // Use the previously stored cover letter URL
+        link.download = 'cover_letter.pdf'; // Default download filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        console.error('No cover letter URL found for download.');
+    }
 }
 
 // Check for successful payment on page load
