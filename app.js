@@ -302,9 +302,11 @@ function checkPaymentStatusAndProceed(description) {
         if (docSnapshot.exists()) {
             const paymentStatus = docSnapshot.data().payment_status;
             if (paymentStatus) {
-                triggerCoverLetterDownload();
+                // If payment_status is true, directly generate the cover letter and download
+                generateCoverLetter(description, true);  // Pass true to bypass payment
             } else {
-                generateCoverLetter(description);
+                // If payment_status is false, proceed to payment
+                generateCoverLetter(description, false);  // Pass false to require payment
             }
         }
     }).catch((error) => {
@@ -313,7 +315,7 @@ function checkPaymentStatusAndProceed(description) {
 }
 
 // Generate Cover Letter and Redirect to Payment
-function generateCoverLetter(description) {
+function generateCoverLetter(description, bypassPayment) {
     showLoader();
 
     const requestData = {
@@ -337,13 +339,13 @@ function generateCoverLetter(description) {
 
         uploadedFileUrl = coverLetterUrl;  // Store for later use
 
-        // Use the fixed Stripe payment URL
-        const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
-
-        if (stripePaymentUrl) {
-            redirectToStripePayment(stripePaymentUrl);
+        if (bypassPayment) {
+            // If payment was already made, trigger the download directly
+            triggerCoverLetterDownload();
         } else {
-            alert('Payment URL not available.');
+            // Otherwise, redirect to Stripe payment
+            const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
+            redirectToStripePayment(stripePaymentUrl);
         }
     })
     .catch((error) => {
