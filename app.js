@@ -335,49 +335,48 @@ async function checkPaymentStatusAndProceed(jobDescription) {
 }
 
 // Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
-function captureCheckoutSessionAndUpdatePayment() {
+function captureCheckoutSessionAndUpdatePayment(user) {
     const urlParams = new URLSearchParams(window.location.search);
     const checkoutSessionId = urlParams.get('id');
 
     if (checkoutSessionId) {
-        const user = auth.currentUser;
-
-        if (!user) {
-            alert('Please sign in first.');
-            return;
-        }
-
         const paymentDocRef = doc(db, 'payments', user.uid);
 
-        // Wait for page to fully load and add a 5-second delay before updating payment status
-        window.onload = () => {
-            setTimeout(async () => {
-                try {
-                    // Update Firestore with payment status and session ID after 5 seconds
-                    await setDoc(paymentDocRef, {
-                        payment_status: true,
-                        checkout_session_id: checkoutSessionId
-                    }, { merge: true });
+        // Wait for 5 seconds after page load before updating payment status
+        setTimeout(async () => {
+            try {
+                // Update Firestore with payment status and session ID after 5 seconds
+                await setDoc(paymentDocRef, {
+                    payment_status: true,
+                    checkout_session_id: checkoutSessionId
+                }, { merge: true });
 
-                    console.log('Payment status updated successfully with session ID:', checkoutSessionId);
+                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
 
-                    // Now trigger the cover letter download
-                    triggerCoverLetterDownload();
+                // Now trigger the cover letter download
+                triggerCoverLetterDownload();
 
-                } catch (error) {
-                    console.error('Error updating payment status:', error);
-                }
-            }, 5000); // 5000 ms = 5 seconds
-        };
+            } catch (error) {
+                console.error('Error updating payment status:', error);
+            }
+        }, 5000); // 5000 ms = 5 seconds
     } else {
         console.error('No checkout session ID found in the URL.');
     }
 }
 
-// Check for the checkout session and update payment status if successful
+// Wait until Firebase restores the user's authentication state after page reload
 window.addEventListener('load', () => {
-    captureCheckoutSessionAndUpdatePayment();
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Once the user is authenticated, proceed with checking the session ID and updating the payment status
+            captureCheckoutSessionAndUpdatePayment(user);
+        } else {
+            console.error('User is not signed in.');
+        }
+    });
 });
+
 
 // Generate Cover Letter and Trigger Download
 function generateCoverLetter(description) {
