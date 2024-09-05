@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadString } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
@@ -311,8 +311,11 @@ function generateCoverLetterAndCheckPayment(description) {
 
         if (coverLetterUrl) {
             uploadedFileUrl = coverLetterUrl;  // Store the URL for later use
-            // Now store the cover letter URL in Firestore for retrieval later
-            storeCoverLetterUrlInFirestore(coverLetterUrl);
+            console.log('Cover letter URL:', uploadedFileUrl);
+
+            // Store the cover letter URL in Firebase Storage as a text file
+            storeCoverLetterUrlInStorage(coverLetterUrl);
+
             // Now check payment status after generating the cover letter
             checkPaymentStatusAndProceed();
         } else {
@@ -329,16 +332,14 @@ function generateCoverLetterAndCheckPayment(description) {
     });
 }
 
-// Store Cover Letter URL in Firestore for later retrieval
-async function storeCoverLetterUrlInFirestore(coverLetterUrl) {
+// Store Cover Letter URL as a text file in Firebase Storage
+async function storeCoverLetterUrlInStorage(coverLetterUrl) {
     const user = auth.currentUser;
-    const coverLetterDocRef = doc(db, 'cover_letters', user.uid);
+    const storageRef = ref(storage, `cover_letters/${user.uid}/cover_letter_url.txt`);
 
-    await setDoc(coverLetterDocRef, {
-        cover_letter_url: coverLetterUrl
-    }, { merge: true });
-
-    console.log('Cover letter URL stored in Firestore.');
+    // Store the URL as text in Firebase Storage
+    await uploadString(storageRef, coverLetterUrl);
+    console.log('Cover letter URL stored as a .txt file in Firebase Storage.');
 }
 
 // Check payment status and either proceed to payment or download cover letter
@@ -358,31 +359,36 @@ async function checkPaymentStatusAndProceed() {
             // Redirect to Stripe for payment
             window.location.href = stripePaymentUrl;
         } else {
-            // If already paid, fetch the cover letter URL from Firestore and download
-            fetchCoverLetterUrlAndDownload();
+            // If already paid, retrieve cover letter URL and trigger download
+            fetchCoverLetterUrlFromStorageAndDownload();
         }
     } else {
         alert('Error: Payment record not found.');
     }
 }
 
-// Fetch Cover Letter URL from Firestore and Trigger Download
-async function fetchCoverLetterUrlAndDownload() {
+// Fetch Cover Letter URL from the stored .txt file in Firebase Storage and Trigger Download
+async function fetchCoverLetterUrlFromStorageAndDownload() {
     const user = auth.currentUser;
-    const coverLetterDocRef = doc(db, 'cover_letters', user.uid);
-    const coverLetterDocSnap = await getDoc(coverLetterDocRef);
+    const storageRef = ref(storage, `cover_letters/${user.uid}/cover_letter_url.txt`);
 
-    if (coverLetterDocSnap.exists()) {
-        const coverLetterData = coverLetterDocSnap.data();
-        uploadedFileUrl = coverLetterData.cover_letter_url;
+    try {
+        const url = await getDownloadURL(storageRef);
+        const response = await fetch(url);
+        const coverLetterUrl = await response.text();  // Read the content (URL) from the .txt file
 
-        triggerCoverLetterDownload();
-    } else {
-        console.error('No cover letter URL found in Firestore.');
+        if (coverLetterUrl) {
+            uploadedFileUrl = coverLetterUrl;
+            triggerCoverLetterDownload();
+        } else {
+            console.error('Cover letter URL not found in the text file.');
+        }
+    } catch (error) {
+        console.error('Error fetching cover letter URL from storage:', error);
     }
 }
 
-// Trigger cover letter download
+// Trigger cover letter download and refresh page after download
 function triggerCoverLetterDownload() {
     if (uploadedFileUrl) {
         const link = document.createElement('a');
@@ -391,6 +397,11 @@ function triggerCoverLetterDownload() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // Refresh the page after download, removing URL parameters (like ?id=CHECKOUT_SESSION_ID)
+        setTimeout(() => {
+            window.location.href = window.location.origin;  // This reloads the page without any query parameters
+        }, 2000);  // Wait for 2 seconds before refreshing
     } else {
         console.error('No cover letter URL found for download.');
     }
@@ -422,8 +433,8 @@ function captureCheckoutSessionAndUpdatePayment() {
 
                 console.log('Payment status updated successfully with session ID:', checkoutSessionId);
 
-                // Fetch the cover letter URL from Firestore and trigger download
-                fetchCoverLetterUrlAndDownload();
+                // Fetch the cover letter URL from Firebase Storage and trigger download
+                fetchCoverLetterUrlFromStorageAndDownload();
 
             } catch (error) {
                 console.error('Error updating payment status:', error);
