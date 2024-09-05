@@ -419,7 +419,8 @@ function updateProgressBar(stepIndex) {
             step.classList.add('active');
         } else {
             step.classList.remove('active');
-    }
+        }
+    });
 }
 
 // FAQ Toggle
