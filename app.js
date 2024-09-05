@@ -311,8 +311,6 @@ function generateCoverLetterAndCheckPayment(description) {
 
         if (coverLetterUrl) {
             uploadedFileUrl = coverLetterUrl;  // Store the URL for later use
-            console.log('Cover letter URL:', uploadedFileUrl);
-
             // Now check payment status after generating the cover letter
             checkPaymentStatusAndProceed();
         } else {
@@ -368,6 +366,20 @@ function triggerCoverLetterDownload() {
     }
 }
 
+// Check if the payment record exists and create one if it doesn't
+async function checkAndCreatePaymentRecord(user) {
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (!paymentDocSnap.exists()) {
+        // Create a payment record with payment_status = false
+        await setDoc(paymentDocRef, { payment_status: false });
+        console.log('Created new payment record for user:', user.uid);
+    } else {
+        console.log('Payment record already exists for user:', user.uid);
+    }
+}
+
 // Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
 function captureCheckoutSessionAndUpdatePayment() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -394,12 +406,8 @@ function captureCheckoutSessionAndUpdatePayment() {
 
                 console.log('Payment status updated successfully with session ID:', checkoutSessionId);
 
-                // Now trigger the cover letter download, only if uploadedFileUrl is set
-                if (uploadedFileUrl) {
-                    triggerCoverLetterDownload();
-                } else {
-                    console.error('Cover letter URL not available at the time of download.');
-                }
+                // Now trigger the cover letter download
+                triggerCoverLetterDownload();
 
             } catch (error) {
                 console.error('Error updating payment status:', error);
@@ -421,20 +429,6 @@ window.addEventListener('load', () => {
         }
     });
 });
-
-// Check if the payment record exists and create one if it doesn't
-async function checkAndCreatePaymentRecord(user) {
-    const paymentDocRef = doc(db, 'payments', user.uid);
-    const paymentDocSnap = await getDoc(paymentDocRef);
-
-    if (!paymentDocSnap.exists()) {
-        // Create a payment record with payment_status = false
-        await setDoc(paymentDocRef, { payment_status: false });
-        console.log('Created new payment record for user:', user.uid);
-    } else {
-        console.log('Payment record already exists for user:', user.uid);
-    }
-}
 
 // Show loader
 function showLoader() {
