@@ -332,7 +332,7 @@ function generateCoverLetter(description) {
         uploadedFileUrl = coverLetterUrl;  // Store for later use
 
         // Use the fixed Stripe payment URL
-        const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145';
+        const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
 
         if (stripePaymentUrl) {
             redirectToStripePayment(stripePaymentUrl);
