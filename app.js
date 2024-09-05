@@ -209,26 +209,6 @@ function checkPaymentStatus(user) {
         });
 }
 
-// Function to capture payment confirmation and update payment status
-function capturePaymentConfirmation() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const checkoutSessionId = urlParams.get('id');
-
-    if (checkoutSessionId) {
-        const user = auth.currentUser;
-        const paymentRef = doc(db, 'payments', user.uid);
-
-        updateDoc(paymentRef, { payment_status: true, session_id: checkoutSessionId })
-            .then(() => {
-                console.log('Payment confirmed. Payment status updated.');
-                triggerCoverLetterDownload();  // Proceed with download after payment confirmation
-            })
-            .catch(error => {
-                console.error('Error updating payment status:', error);
-            });
-    }
-}
-
 // Trigger payment flow if necessary when generating the cover letter
 function handleGenerateCoverLetter(description) {
     const user = auth.currentUser;
@@ -246,6 +226,31 @@ function handleGenerateCoverLetter(description) {
             generateCoverLetter(description);
         }
     });
+}
+
+// Function to capture payment confirmation and update payment status
+function capturePaymentConfirmation() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutSessionId = urlParams.get('id');
+
+    if (checkoutSessionId) {
+        const user = auth.currentUser;
+        const paymentRef = doc(db, 'payments', user.uid);
+
+        updateDoc(paymentRef, { payment_status: true, session_id: checkoutSessionId })
+            .then(() => {
+                console.log('Payment confirmed. Payment status updated.');
+                // Continue with cover letter generation after payment confirmation
+                const jobDescriptionInput = document.getElementById('job-description-input');
+                const description = jobDescriptionInput ? jobDescriptionInput.value.trim() : null;
+                if (description && uploadedFileUrl) {
+                    generateCoverLetter(description);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating payment status:', error);
+            });
+    }
 }
 
 // Drag and Drop functionality
