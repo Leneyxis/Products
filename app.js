@@ -209,19 +209,6 @@ function checkPaymentStatus(user) {
         });
 }
 
-// Trigger payment if the user has not paid
-function handlePayment(user) {
-    checkPaymentStatus(user).then((hasPaid) => {
-        if (!hasPaid) {
-            // If payment status is false, redirect to Stripe payment
-            window.location.href = stripePaymentUrl;
-        } else {
-            // If already paid, trigger download directly
-            triggerCoverLetterDownload();
-        }
-    });
-}
-
 // Function to capture payment confirmation and update payment status
 function capturePaymentConfirmation() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -242,20 +229,24 @@ function capturePaymentConfirmation() {
     }
 }
 
-// Ensure file selection triggers sign-in if the user is not logged in
-uploadButton.addEventListener('click', () => {
+// Trigger payment flow if necessary when generating the cover letter
+function handleGenerateCoverLetter(description) {
     const user = auth.currentUser;
     if (!user) {
-        // If user is not signed in, trigger the login modal
-        loginModal.style.display = 'flex';
-        setTimeout(() => {
-            loginModal.classList.add('show');
-        }, 10);  // Slight delay to allow CSS transition
-    } else {
-        // Check payment status before allowing file upload or download
-        handlePayment(user);
+        alert('Please sign in first.');
+        return;
     }
-});
+
+    checkPaymentStatus(user).then((hasPaid) => {
+        if (!hasPaid) {
+            // If payment status is false, redirect to Stripe payment
+            window.location.href = stripePaymentUrl;
+        } else {
+            // If already paid, generate the cover letter
+            generateCoverLetter(description);
+        }
+    });
+}
 
 // Drag and Drop functionality
 uploadBox.addEventListener('dragover', (e) => {
@@ -337,7 +328,7 @@ function showJobDescriptionInput() {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
             updateProgressBar(2);  // Move to step 3 on Generate button click
-            generateCoverLetter(description);  // Generate cover letter
+            handleGenerateCoverLetter(description);  // Check payment and generate cover letter
         } else {
             alert('Please enter a job description.');
         }
