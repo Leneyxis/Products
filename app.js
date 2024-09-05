@@ -349,22 +349,25 @@ function captureCheckoutSessionAndUpdatePayment() {
 
         const paymentDocRef = doc(db, 'payments', user.uid);
 
-        // Wait for page to fully load before updating payment status
-        window.onload = async () => {
-            try {
-                await setDoc(paymentDocRef, {
-                    payment_status: true,
-                    checkout_session_id: checkoutSessionId
-                }, { merge: true });
+        // Wait for page to fully load and add a 5-second delay before updating payment status
+        window.onload = () => {
+            setTimeout(async () => {
+                try {
+                    // Update Firestore with payment status and session ID after 5 seconds
+                    await setDoc(paymentDocRef, {
+                        payment_status: true,
+                        checkout_session_id: checkoutSessionId
+                    }, { merge: true });
 
-                console.log('Payment status updated successfully with session ID:', checkoutSessionId);
+                    console.log('Payment status updated successfully with session ID:', checkoutSessionId);
 
-                // Now trigger the cover letter download
-                triggerCoverLetterDownload();
+                    // Now trigger the cover letter download
+                    triggerCoverLetterDownload();
 
-            } catch (error) {
-                console.error('Error updating payment status:', error);
-            }
+                } catch (error) {
+                    console.error('Error updating payment status:', error);
+                }
+            }, 5000); // 5000 ms = 5 seconds
         };
     } else {
         console.error('No checkout session ID found in the URL.');
