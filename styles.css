@@ -727,6 +727,126 @@ footer {
     cursor: pointer;
 }
 
+@media (min-width: 1025px) and (max-width: 1920px) {
+    body {
+        font-size: 16px;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Reduce header padding for more compact space */
+    header {
+        padding: 15px 0;
+    }
+
+    /* Limit width of containers for better readability */
+    .container {
+        width: 85%; /* Reduced width for a tighter layout */
+        max-width: 1100px;
+    }
+
+    /* Reduce button padding and margin */
+    .auth-buttons button {
+        padding: 6px 12px;
+        margin-left: 8px;
+    }
+
+    /* Hero Section: reduce whitespace and image size */
+    .hero {
+        padding: 30px 0;
+    }
+
+    .hero img {
+        max-width: 300px; /* Reduce image size */
+        margin-right: 30px;
+    }
+
+    .hero-text {
+        max-width: 550px;
+    }
+
+    /* Progress Bar: Reduce spacing between steps */
+    .progress-bar {
+        margin: 15px 0;
+    }
+
+    .step {
+        width: 32%; /* Ensure progress bar steps are compact */
+    }
+
+    /* Reduce padding and margin in the upload box */
+    .upload-box {
+        padding: 15px; /* Less padding for a tighter look */
+        margin: 15px auto; /* Reduce margin */
+        max-width: 550px;
+    }
+
+    /* Smaller buttons in the upload section */
+    .upload-button, .generate-button {
+        padding: 8px 16px;
+    }
+
+    /* Job description textarea */
+    #job-description-input {
+        max-width: 550px;
+        padding: 15px; /* Slightly less padding */
+        margin-bottom: 15px; /* Reduce bottom margin */
+    }
+
+    /* Modal Styles: ensure modals are compact and centered */
+    .modal-content {
+        padding: 25px; /* Reduce padding */
+        max-width: 400px; /* Slightly smaller modal width */
+    }
+
+    /* Input fields in modal */
+    .input-container input {
+        padding: 10px 18px; /* Less padding for tighter form */
+    }
+
+    /* Buttons in modal */
+    .login-btn, .google-sign-in-btn {
+        padding: 8px 18px; /* Smaller buttons */
+        font-size: 15px; /* Slightly smaller font */
+    }
+
+    /* FAQ Section: Reduce padding */
+    .faq {
+        padding: 15px;
+        font-size: 15px; /* Slightly smaller font for Mac screens */
+    }
+
+    /* Call to Action Section: Reduce padding */
+    .cta {
+        padding: 50px 15px;
+    }
+
+    .cta h2 {
+        font-size: 30px;
+    }
+
+    /* Benefits Section: Tighter layout */
+    .benefits {
+        justify-content: space-around; /* Less spacing between benefits */
+    }
+
+    .benefit {
+        max-width: 260px;
+        padding: 12px; /* Less padding inside benefits */
+    }
+
+    /* Loader: Smaller loader */
+    .loader .spinner {
+        width: 50px;
+        height: 50px;
+    }
+
+    /* Footer: Reduce padding */
+    footer {
+        padding: 15px 0;
+    }
+}
+
 #toggle-auth a:hover {
     text-decoration: underline;
 }
