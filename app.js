@@ -45,6 +45,9 @@ let currentStep = 0;
 // API URL
 const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/resume_cover';
 
+// Stripe Payment URL
+const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
+
 // Variable to store the download URL
 let uploadedFileUrl = '';
 
@@ -89,6 +92,7 @@ googleSignInButton.addEventListener('click', () => {
                 loginModal.style.display = 'none';
             }, 300);  // Wait for the transition to complete before hiding
             toggleUI(true);
+            checkAndCreatePaymentRecord(result.user);
         })
         .catch(error => {
             console.error('Sign in error:', error);
@@ -109,6 +113,7 @@ loginButton.addEventListener('click', () => {
                 loginModal.style.display = 'none';
             }, 300);  // Wait for the transition to complete before hiding
             toggleUI(true);
+            checkAndCreatePaymentRecord(user);
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -130,6 +135,7 @@ signupButton.addEventListener('click', () => {
             
             toggleUI(true);
             loginModal.style.display = 'none'; // Hide modal after sign-up
+            checkAndCreatePaymentRecord(user);
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -159,6 +165,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         // User is signed in
         toggleUI(true);
+        checkAndCreatePaymentRecord(user);
     } else {
         // User is signed out
         toggleUI(false);
@@ -271,7 +278,7 @@ function showJobDescriptionInput() {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
             updateProgressBar(2);  // Move to step 3 on Generate button click
-            generateCoverLetter(description);  // Generate cover letter
+            checkPaymentStatusAndProceed(description);  // Check payment and proceed with cover letter generation
         } else {
             alert('Please enter a job description.');
         }
@@ -286,6 +293,73 @@ function showLoader() {
 // Function to hide loader
 function hideLoader() {
     document.getElementById('loader').style.display = 'none';
+}
+
+// Check if the payment record exists and create one if it doesn't
+async function checkAndCreatePaymentRecord(user) {
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (!paymentDocSnap.exists()) {
+        // Create a payment record with payment_status = false
+        await setDoc(paymentDocRef, { payment_status: false });
+        console.log('Created new payment record for user:', user.uid);
+    } else {
+        console.log('Payment record already exists for user:', user.uid);
+    }
+}
+
+// Check payment status and either proceed to payment or generate cover letter
+async function checkPaymentStatusAndProceed(jobDescription) {
+    const user = auth.currentUser;
+    if (!user) {
+        alert('Please sign in first.');
+        return;
+    }
+
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (paymentDocSnap.exists()) {
+        const paymentData = paymentDocSnap.data();
+        if (paymentData.payment_status === false) {
+            // Redirect to Stripe for payment
+            window.location.href = stripePaymentUrl;
+        } else {
+            // If already paid, generate and download cover letter
+            generateCoverLetter(jobDescription);
+        }
+    } else {
+        alert('Error: Payment record not found.');
+    }
+}
+
+// Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
+function captureCheckoutSessionAndUpdatePayment() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutSessionId = urlParams.get('id');
+
+    if (checkoutSessionId) {
+        const user = auth.currentUser;
+        if (!user) {
+            alert('Please sign in first.');
+            return;
+        }
+
+        const paymentDocRef = doc(db, 'payments', user.uid);
+        setDoc(paymentDocRef, {
+            payment_status: true,
+            checkout_session_id: checkoutSessionId
+        }, { merge: true })
+        .then(() => {
+            console.log('Payment status updated successfully with session ID:', checkoutSessionId);
+            // Now trigger the cover letter download
+            triggerCoverLetterDownload();
+        })
+        .catch((error) => {
+            console.error('Error updating payment status:', error);
+        });
+    }
 }
 
 // Generate Cover Letter and Trigger Download
@@ -345,8 +419,7 @@ function updateProgressBar(stepIndex) {
             step.classList.add('active');
         } else {
             step.classList.remove('active');
-        }
-    });
+    }
 }
 
 // FAQ Toggle
@@ -362,3 +435,8 @@ document.querySelectorAll('.faq-question').forEach(question => {
         answer.style.display = isVisible ? 'none' : 'block';
     });
 });
+
+// Check for the checkout session and update payment status if successful
+window.onload = () => {
+    captureCheckoutSessionAndUpdatePayment();
+};
