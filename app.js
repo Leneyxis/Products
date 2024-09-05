@@ -21,6 +21,7 @@ const storage = getStorage(app);
 
 // Google Auth Provider
 const provider = new GoogleAuthProvider();
+
 // DOM Elements
 const signInButton = document.getElementById('sign-in-button');
 const signOutButton = document.getElementById('sign-out-button');
@@ -30,12 +31,12 @@ const resumeUpload = document.getElementById('resume-upload');
 const loginModal = document.getElementById('login-modal');
 const closeButton = document.querySelector('.close-button');
 const googleSignInButton = document.getElementById('google-sign-in');
-const loginButton = document.getElementById('login-button'); 
+const loginButton = document.getElementById('login-button');
 const signupButton = document.getElementById('signup-button');
 const emailInput = document.querySelector('input[type="text"]');
 const passwordInput = document.querySelector('input[type="password"]');
 const toggleLink = document.getElementById('toggle-link');
-const steps = document.querySelectorAll('.step');  // Progress bar steps
+const steps = document.querySelectorAll('.step');
 let isSignUpMode = false;
 let currentStep = 0;
 
@@ -149,7 +150,6 @@ signOutButton.addEventListener('click', () => {
             console.error('Sign out error:', error);
         });
 });
-
 
 // Listen for changes in the auth state (e.g., sign in, sign out)
 onAuthStateChanged(auth, (user) => {
@@ -329,20 +329,22 @@ function redirectToStripePayment(stripeUrl) {
 
 // Handle successful payment and download
 function handleSuccessfulPayment() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentStatus = urlParams.get('payment_status');
-    const coverLetterUrl = urlParams.get('cover_letter_url');
+    const thanksForPaymentText = document.querySelector('.Text.Text-color--default.Text-fontSize--20.Text-fontWeight--600');
+    const isPaymentSuccess = thanksForPaymentText && thanksForPaymentText.innerText === "Thanks for your payment";
 
-    if (paymentStatus === 'success' && coverLetterUrl) {
-        document.getElementById('payment-success').style.display = 'block';
-        
+    if (isPaymentSuccess && !sessionStorage.getItem('paymentProcessed')) {
+        console.log('Payment successful, downloading cover letter...');
+
         // Trigger the download
         const link = document.createElement('a');
-        link.href = coverLetterUrl;
-        link.download = coverLetterUrl.split('/').pop();
+        link.href = uploadedFileUrl;  // Use the previously stored file URL
+        link.download = 'cover_letter.pdf'; // Default download filename
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // Mark payment as processed
+        sessionStorage.setItem('paymentProcessed', 'true');
     }
 }
 
