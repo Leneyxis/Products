@@ -329,6 +329,45 @@ function generateCoverLetterAndCheckPayment(description) {
     });
 }
 
+// Check payment status and either proceed to payment or download cover letter
+async function checkPaymentStatusAndProceed() {
+    const user = auth.currentUser;
+    if (!user) {
+        alert('Please sign in first.');
+        return;
+    }
+
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (paymentDocSnap.exists()) {
+        const paymentData = paymentDocSnap.data();
+        if (paymentData.payment_status === false) {
+            // Redirect to Stripe for payment
+            window.location.href = stripePaymentUrl;
+        } else {
+            // If already paid, trigger the download of the cover letter
+            triggerCoverLetterDownload();
+        }
+    } else {
+        alert('Error: Payment record not found.');
+    }
+}
+
+// Trigger cover letter download
+function triggerCoverLetterDownload() {
+    if (uploadedFileUrl) {
+        const link = document.createElement('a');
+        link.href = uploadedFileUrl;
+        link.download = 'AI_cover_letter.pdf';  // Rename the file to AI_cover_letter.pdf
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        console.error('No cover letter URL found for download.');
+    }
+}
+
 // Capture the CHECKOUT_SESSION_ID from the URL after payment and update Firestore
 function captureCheckoutSessionAndUpdatePayment() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -371,45 +410,6 @@ function captureCheckoutSessionAndUpdatePayment() {
     }
 }
 
-// Check payment status and either proceed to payment or download cover letter
-async function checkPaymentStatusAndProceed() {
-    const user = auth.currentUser;
-    if (!user) {
-        alert('Please sign in first.');
-        return;
-    }
-
-    const paymentDocRef = doc(db, 'payments', user.uid);
-    const paymentDocSnap = await getDoc(paymentDocRef);
-
-    if (paymentDocSnap.exists()) {
-        const paymentData = paymentDocSnap.data();
-        if (paymentData.payment_status === false) {
-            // Redirect to Stripe for payment
-            window.location.href = stripePaymentUrl;
-        } else {
-            // If already paid, trigger the download of the cover letter
-            triggerCoverLetterDownload();
-        }
-    } else {
-        alert('Error: Payment record not found.');
-    }
-}
-
-// Trigger cover letter download
-function triggerCoverLetterDownload() {
-    if (uploadedFileUrl) {
-        const link = document.createElement('a');
-        link.href = uploadedFileUrl;
-        link.download = 'AI_cover_letter.pdf';  // Rename the file to AI_cover_letter.pdf
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } else {
-        console.error('No cover letter URL found for download.');
-    }
-}
-
 // Check for the checkout session and update payment status if successful
 window.addEventListener('load', () => {
     onAuthStateChanged(auth, (user) => {
@@ -421,6 +421,20 @@ window.addEventListener('load', () => {
         }
     });
 });
+
+// Check if the payment record exists and create one if it doesn't
+async function checkAndCreatePaymentRecord(user) {
+    const paymentDocRef = doc(db, 'payments', user.uid);
+    const paymentDocSnap = await getDoc(paymentDocRef);
+
+    if (!paymentDocSnap.exists()) {
+        // Create a payment record with payment_status = false
+        await setDoc(paymentDocRef, { payment_status: false });
+        console.log('Created new payment record for user:', user.uid);
+    } else {
+        console.log('Payment record already exists for user:', user.uid);
+    }
+}
 
 // Show loader
 function showLoader() {
