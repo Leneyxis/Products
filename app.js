@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Your Firebase configuration
@@ -17,6 +18,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 const storage = getStorage(app);
 
 // Google Auth Provider
@@ -285,74 +287,6 @@ function hideLoader() {
     document.getElementById('loader').style.display = 'none';
 }
 
-// Generate Cover Letter and Redirect to Payment
-function generateCoverLetter(description) {
-    showLoader();
-
-    const requestData = {
-        link: uploadedFileUrl,
-        job_description: description
-    };
-
-    fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
-        // Use the fixed Stripe payment URL
-        const stripePaymentUrl = 'https://buy.stripe.com/9AQ03N36954wbcs145';
-
-        if (stripePaymentUrl) {
-            // Redirect to Stripe payment
-            redirectToStripePayment(stripePaymentUrl);
-        } else {
-            alert('Payment URL not available.');
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        hideLoader();
-    });
-}
-
-// Function to redirect to Stripe payment
-function redirectToStripePayment(stripeUrl) {
-    window.location.href = stripeUrl;
-}
-
-// Handle successful payment and download
-function handleSuccessfulPayment() {
-    const thanksForPaymentText = document.querySelector('.Text.Text-color--default.Text-fontSize--20.Text-fontWeight--600');
-    const isPaymentSuccess = thanksForPaymentText && thanksForPaymentText.innerText === "Thanks for your payment";
-
-    if (isPaymentSuccess && !sessionStorage.getItem('paymentProcessed')) {
-        console.log('Payment successful, downloading cover letter...');
-
-        // Trigger the download
-        const link = document.createElement('a');
-        link.href = uploadedFileUrl;  // Use the previously stored file URL
-        link.download = 'cover_letter.pdf'; // Default download filename
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Mark payment as processed
-        sessionStorage.setItem('paymentProcessed', 'true');
-    }
-}
-
-// Check for successful payment on page load
-document.addEventListener('DOMContentLoaded', () => {
-    handleSuccessfulPayment();
-});
-
 // Function to update the progress bar
 function updateProgressBar(stepIndex) {
     steps.forEach((step, index) => {
@@ -363,6 +297,105 @@ function updateProgressBar(stepIndex) {
         }
     });
 }
+
+// Generate Cover Letter and Redirect to Payment
+async function generateCoverLetter(description) {
+    showLoader();
+    const user = auth.currentUser;
+
+    // Check if the user has already paid
+    const hasPaid = await hasUserPaid(user.uid);
+
+    if (hasPaid) {
+        // If already paid, skip payment and trigger download
+        triggerCoverLetterDownload();
+    } else {
+        // Proceed with generating the cover letter and redirecting to payment
+        const requestData = {
+            link: uploadedFileUrl,
+            job_description: description
+        };
+
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
+
+            if (stripePaymentUrl) {
+                // Redirect to Stripe payment
+                redirectToStripePayment(stripePaymentUrl);
+            } else {
+                alert('Payment URL not available.');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            hideLoader();
+        });
+    }
+}
+
+// Redirect to Stripe payment
+function redirectToStripePayment(stripeUrl) {
+    window.location.href = stripeUrl;
+}
+
+// Capture checkout session ID from the URL
+const urlParams = new URLSearchParams(window.location.search);
+const checkoutSessionId = urlParams.get('id');
+
+// Save payment ID to Firebase
+async function savePaymentIdToFirebase(userId, sessionId) {
+    const userRef = doc(db, 'users', userId);
+    await setDoc(userRef, { paymentSessionId: sessionId }, { merge: true });
+}
+
+// Check if user has already paid
+async function hasUserPaid(userId) {
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    return userDoc.exists() && userDoc.data().paymentSessionId;
+}
+
+// Handle successful payment and download
+async function handleSuccessfulPayment() {
+    const user = auth.currentUser;
+    if (user && checkoutSessionId) {
+        const hasPaid = await hasUserPaid(user.uid);
+
+        if (!hasPaid) {
+            // Save the payment ID to Firebase
+            await savePaymentIdToFirebase(user.uid, checkoutSessionId);
+            
+            // Trigger cover letter download
+            triggerCoverLetterDownload();
+        }
+    }
+}
+
+// Trigger the cover letter download
+function triggerCoverLetterDownload() {
+    const link = document.createElement('a');
+    link.href = uploadedFileUrl;  // Use the previously stored file URL
+    link.download = 'cover_letter.pdf'; // Default download filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Check for successful payment on page load
+document.addEventListener('DOMContentLoaded', () => {
+    handleSuccessfulPayment();
+});
 
 // FAQ Toggle
 document.querySelectorAll('.faq-question').forEach(question => {
