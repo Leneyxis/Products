@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -47,10 +47,6 @@ const apiUrl = 'https://p12uecufp5.execute-api.us-west-1.amazonaws.com/default/r
 
 // Variable to store the download URL
 let uploadedFileUrl = '';
-
-// Stripe payment URLs
-const stripePaymentUrl = 'https://buy.stripe.com/test_14keYE1E12eHgUgfZ0';
-const paymentConfirmationUrl = 'https://reliable-genie-706794.netlify.app';
 
 // Toggle between Sign-In and Sign-Up
 toggleLink.addEventListener('click', (e) => {
@@ -118,7 +114,7 @@ loginButton.addEventListener('click', () => {
             const errorCode = error.code;
             const errorMessage = error.message;
             console.error('Email sign in error:', errorCode, errorMessage);
-            alert(`Error: ${errorMessage}`);
+            alert(Error: ${errorMessage});
         });
 });
 
@@ -131,17 +127,7 @@ signupButton.addEventListener('click', () => {
         .then((userCredential) => {
             const user = userCredential.user;
             console.log('User signed up:', user);
-
-            // Initialize payment status
-            const paymentRef = doc(db, 'payments', user.uid);
-            setDoc(paymentRef, { payment_status: false })
-                .then(() => {
-                    console.log('Payment status initialized.');
-                })
-                .catch(error => {
-                    console.error('Error initializing payment status:', error);
-                });
-
+            
             toggleUI(true);
             loginModal.style.display = 'none'; // Hide modal after sign-up
         })
@@ -149,7 +135,7 @@ signupButton.addEventListener('click', () => {
             const errorCode = error.code;
             const errorMessage = error.message;
             console.error('Sign up error:', errorCode, errorMessage);
-            alert(`Sign up failed: ${errorMessage}`);
+            alert(Sign up failed: ${errorMessage});
         });
 });
 
@@ -171,9 +157,10 @@ signOutButton.addEventListener('click', () => {
 // Listen for changes in the auth state (e.g., sign in, sign out)
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        capturePaymentConfirmation(); // Check if there's a payment confirmation in the URL
+        // User is signed in
         toggleUI(true);
     } else {
+        // User is signed out
         toggleUI(false);
     }
 });
@@ -189,69 +176,20 @@ function toggleUI(isSignedIn) {
     }
 }
 
-// Function to handle checking payment status
-function checkPaymentStatus(user) {
-    const paymentRef = doc(db, 'payments', user.uid);
-
-    return getDoc(paymentRef)
-        .then((docSnap) => {
-            if (docSnap.exists()) {
-                const paymentData = docSnap.data();
-                return paymentData.payment_status;  // Return the payment status
-            } else {
-                // If no payment data exists, create a new record with payment_status = false
-                return setDoc(paymentRef, { payment_status: false }).then(() => false);
-            }
-        })
-        .catch((error) => {
-            console.error('Error fetching payment status:', error);
-            return false;
-        });
-}
-
-// Trigger payment flow if necessary when generating the cover letter
-function handleGenerateCoverLetter(description) {
+// Ensure file selection triggers sign-in if the user is not logged in
+uploadButton.addEventListener('click', () => {
     const user = auth.currentUser;
     if (!user) {
-        alert('Please sign in first.');
-        return;
+        // If user is not signed in, trigger the login modal
+        loginModal.style.display = 'flex';
+        setTimeout(() => {
+            loginModal.classList.add('show');
+        }, 10);  // Slight delay to allow CSS transition
+    } else {
+        // If signed in, trigger the file upload
+        resumeUpload.click();
     }
-
-    checkPaymentStatus(user).then((hasPaid) => {
-        if (!hasPaid) {
-            // If payment status is false, redirect to Stripe payment
-            window.location.href = stripePaymentUrl;
-        } else {
-            // If already paid, generate the cover letter
-            generateCoverLetter(description);
-        }
-    });
-}
-
-// Function to capture payment confirmation and update payment status
-function capturePaymentConfirmation() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const checkoutSessionId = urlParams.get('id');
-
-    if (checkoutSessionId) {
-        const user = auth.currentUser;
-        const paymentRef = doc(db, 'payments', user.uid);
-
-        updateDoc(paymentRef, { payment_status: true, session_id: checkoutSessionId })
-            .then(() => {
-                console.log('Payment confirmed. Payment status updated.');
-                // Continue with cover letter generation after payment confirmation
-                const jobDescriptionInput = document.getElementById('job-description-input');
-                const description = jobDescriptionInput ? jobDescriptionInput.value.trim() : null;
-                if (description && uploadedFileUrl) {
-                    generateCoverLetter(description);
-                }
-            })
-            .catch(error => {
-                console.error('Error updating payment status:', error);
-            });
-    }
-}
+});
 
 // Drag and Drop functionality
 uploadBox.addEventListener('dragover', (e) => {
@@ -296,7 +234,7 @@ function handleFileUpload(file) {
 
     showLoader();  // Show loader while uploading
 
-    const storageRef = ref(storage, `resumes/${user.uid}/${file.name}`);
+    const storageRef = ref(storage, resumes/${user.uid}/${file.name});
     uploadBytes(storageRef, file)
         .then((snapshot) => {
             console.log('File uploaded successfully');
@@ -333,7 +271,7 @@ function showJobDescriptionInput() {
         const description = jobDescriptionInput.value.trim();
         if (description && uploadedFileUrl) {
             updateProgressBar(2);  // Move to step 3 on Generate button click
-            handleGenerateCoverLetter(description);  // Check payment and generate cover letter
+            generateCoverLetter(description);  // Generate cover letter
         } else {
             alert('Please enter a job description.');
         }
