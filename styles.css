@@ -419,7 +419,7 @@ nav ul li a {
 .features,
 .benefits {
     display: flex;
-    justify-content: space-evenly;
+    gap: 1em;
     flex-wrap: wrap;
 }
 
@@ -427,10 +427,10 @@ nav ul li a {
 .benefit {
     max-width: 280px;
     text-align: left;
-    margin-bottom: 8px; /* Reduced from 20px */
+    margin-bottom: 20px; /* Reduced from 20px */
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
-    padding: 6px; /* Reduced from 15px */
+    padding: 15px; /* Reduced from 15px */
 }
 
 .feature img,
