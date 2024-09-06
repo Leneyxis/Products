@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL, uploadString } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -37,8 +37,9 @@ const loginButton = document.getElementById('login-button');
 const signupButton = document.getElementById('signup-button');
 const emailInput = document.querySelector('input[type="text"]');
 const passwordInput = document.querySelector('input[type="password"]');
+const forgotPasswordLink = document.querySelector('.forgot-password a');  // For the forgot password functionality
 const toggleLink = document.getElementById('toggle-link');
-const steps = document.querySelectorAll('.step');
+const authHeader = document.getElementById('auth-header');  // For changing login/signup header
 let isSignUpMode = false;
 let currentStep = 0;
 
@@ -59,10 +60,12 @@ toggleLink.addEventListener('click', (e) => {
         document.getElementById('login-button').style.display = 'none';
         signupButton.style.display = 'block';
         toggleLink.textContent = 'Already have an account? Sign In';
+        authHeader.textContent = 'Sign Up';  // Change to "Sign Up" in header
     } else {
         document.getElementById('login-button').style.display = 'block';
         signupButton.style.display = 'none';
         toggleLink.textContent = 'Don’t have an account? Sign Up';
+        authHeader.textContent = 'Login';  // Change to "Login" in header
     }
 });
 
@@ -142,6 +145,27 @@ signupButton.addEventListener('click', () => {
             const errorMessage = error.message;
             console.error('Sign up error:', errorCode, errorMessage);
             alert(`Sign up failed: ${errorMessage}`);
+        });
+});
+
+// Forgot Password functionality
+forgotPasswordLink.addEventListener('click', () => {
+    const email = emailInput.value;
+
+    if (!email) {
+        alert('Please enter your email to reset your password.');
+        return;
+    }
+
+    sendPasswordResetEmail(auth, email)
+        .then(() => {
+            alert('Password reset email sent! Please check your inbox.');
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error('Password reset error:', errorCode, errorMessage);
+            alert(`Error: ${errorMessage}`);
         });
 });
 
