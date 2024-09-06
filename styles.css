@@ -416,7 +416,6 @@ nav ul li a {
 }
 
 /* Features and Benefits */
-/* Features and Benefits */
 .features,
 .benefits {
     display: flex;
@@ -427,15 +426,13 @@ nav ul li a {
 
 .feature,
 .benefit {
-    flex-grow: 1; /* Ensures all boxes expand evenly */
     max-width: 280px;
-    min-height: 320px; /* Sets a consistent minimum height */
+    max-height: auto;
     text-align: left;
     margin-bottom: 20px;
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
     padding: 15px;
-    box-sizing: border-box; /* Ensures padding is included in the height */
 }
 
 .feature img,
@@ -454,13 +451,6 @@ nav ul li a {
 .feature p,
 .benefit p {
     font-size: 14px;
-    flex-grow: 1; /* Ensure text area fills available space */
-}
-
-.benefit {
-    display: flex;
-    flex-direction: column; /* Keeps elements aligned vertically */
-    justify-content: space-between; /* Ensures proper spacing between elements */
 }
 
 /* Call to Action Section */
