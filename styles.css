@@ -97,7 +97,6 @@ nav ul li a {
     display: flex;
     justify-content: space-between;
     margin: 20px 0;
-    justify-content: center;
 }
 
 .step {
@@ -427,18 +426,13 @@ nav ul li a {
 
 .feature,
 .benefit {
-    flex-grow: 1;
     max-width: 280px;
-    min-height: 200px; /* Set minimum height for consistency */
+    min-height: auto;
     text-align: left;
     margin-bottom: 20px;
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
-    padding: 20px; /* Increased padding for better spacing */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Ensure content is evenly spaced */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for card effect */
+    padding: 15px;
 }
 
 .feature img,
@@ -457,7 +451,6 @@ nav ul li a {
 .feature p,
 .benefit p {
     font-size: 14px;
-    flex-grow: 1; /* Ensures text expands to take available space */
 }
 
 /* Call to Action Section */
