@@ -662,43 +662,129 @@ footer {
     }
 }
 
-/* Tablet Devices */
+/* Tablet Devices Optimization */
 @media (min-width: 768px) and (max-width: 1024px) {
     body {
-        font-size: 16px;
+        font-size: 16px; /* Comfortable font size for tablets */
+    }
+
+    /* Header */
+    header {
+        padding: 15px 0; /* Slightly reduced padding to fit smaller screens */
+    }
+
+    .container {
+        width: 95%; /* Take up more width on tablets */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .auth-buttons button {
+        padding: 6px 12px; /* Reduced padding for buttons */
+        font-size: 14px; /* Smaller text for buttons */
+    }
+
+    /* Hero Section */
+    .hero {
+        padding: 30px 15px; /* Adjust padding for smaller screens */
     }
 
     .hero-content {
-        flex-direction: row; /* Keep it in row for tablets */
-        padding: 20px;
+        flex-direction: column; /* Stack hero elements vertically for better readability */
+        align-items: center;
+        padding: 15px; /* Ensure some spacing */
     }
 
     .hero img {
-        max-width: 300px; /* Slightly smaller image */
+        max-width: 350px; /* Reduce image size slightly */
+        margin-bottom: 20px; /* Add margin below the image */
     }
 
+    .hero-text {
+        text-align: center; /* Center text for better mobile experience */
+        max-width: 100%; /* Ensure text spans the entire available width */
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+        flex-direction: column; /* Stack progress steps vertically */
+        margin: 20px 0; /* Add spacing */
+    }
+
+    .step {
+        width: 100%; /* Make each step take full width */
+        margin-bottom: 15px; /* Add margin between steps */
+    }
+
+    /* Upload and Job Description Sections */
     .upload-box {
-        max-width: 80%;
+        padding: 20px; /* Consistent padding */
+        max-width: 90%; /* Make the upload box take more width on tablets */
     }
 
+    #job-description-input {
+        width: 100%; /* Full-width for text area */
+        max-width: 100%; /* Ensure full width */
+        height: 180px; /* Slightly reduced height */
+    }
+
+    /* Benefits Section */
+    .features,
+    .benefits {
+        display: flex;
+        flex-direction: column; /* Stack features/benefits vertically for readability */
+        align-items: center; /* Center items */
+    }
+
+    .feature,
+    .benefit {
+        max-width: 100%; /* Allow each feature to take full width */
+        margin-bottom: 20px; /* Add spacing between items */
+        padding: 20px; /* Increased padding for better touch experience */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow for card-like feel */
+    }
+
+    /* Modal Dialog */
     .modal-content {
-        width: 80%;
-        padding: 30px;
+        width: 85%; /* Slightly larger modal on tablet screens */
+        padding: 25px; /* Reduced padding */
+    }
+
+    .modal-content h2 {
+        font-size: 22px; /* Slightly smaller header size */
+    }
+
+    /* FAQ Section */
+    .faq {
+        padding: 15px; /* Adjust padding */
+    }
+
+    .faq-item {
+        margin-bottom: 15px; /* Increase margin between FAQ items */
     }
 
     /* Call to Action Section */
+    .cta {
+        padding: 40px 15px; /* Adjust padding */
+        text-align: center;
+    }
+
     .cta h2 {
-        font-size: 30px;
+        font-size: 28px; /* Slightly smaller text size */
     }
 
-    .benefit {
-        max-width: 300px;
+    .cta-button {
+        padding: 12px 18px; /* Adjust padding for better touch experience */
+        font-size: 16px;
     }
 
+    /* Footer */
     footer {
-        padding: 15px 0;
+        padding: 15px 0; /* Adjust footer padding */
     }
 }
+
 
 
 #login-button, #signup-button {
