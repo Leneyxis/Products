@@ -419,7 +419,8 @@ nav ul li a {
 .features,
 .benefits {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
+    gap: 3em;
     flex-wrap: wrap;
 }
 
