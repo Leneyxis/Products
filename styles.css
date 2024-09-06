@@ -65,69 +65,68 @@ nav ul li a {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
     padding: 40px 20px;
     background-image: url('backdrop.jpg');
     background-size: cover;
-    min-height: 100vh;
 }
 
 .hero-content {
-    text-align: center;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
+    max-width: 1200px;
+    width: 100%;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .hero img {
-    max-width: 200px;
+    max-width: 400px;
+    width: 100%;
     height: auto;
-    margin-bottom: 20px;
+    margin-right: 40px;
+    flex-shrink: 0;
 }
 
 .hero-text {
-    margin-bottom: 40px;
-    font-size: 24px;
+    flex-grow: 1;
     max-width: 600px;
+    width: 100%;
 }
 
 /* Progress Bar */
 .progress-bar {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    max-width: 600px;
-    margin: 30px 0;
+    justify-content: space-between;
+    margin: 20px 0;
 }
 
 .step {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 33%;
 }
 
 .step .circle {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background-color: #007bff;
+    background-color: #cccccc;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white;
+    color: #ffffff;
     font-size: 18px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .step.active .circle {
-    background-color: #28a745;
+    background-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
 }
 
 .step .label {
     font-size: 14px;
-    color: #333;
+    color: #333333;
 }
 
 /* Upload and Job Description Sections */
@@ -136,12 +135,12 @@ nav ul li a {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 30px;
+    padding: 20px;
     border: 2px dashed #007bff;
     border-radius: 8px;
     background-color: #f9fafb;
     max-width: 600px;
-    margin: 20px auto;
+    margin: 20px auto; /* Center the box on the page */
     text-align: center;
 }
 
@@ -153,7 +152,7 @@ nav ul li a {
 
 .upload-button {
     background-color: #007bff;
-    color: white;
+    color: #fff;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -164,6 +163,33 @@ nav ul li a {
 
 .upload-button:hover {
     background-color: #0056b3;
+}
+
+.job-section,
+.results-section {
+    border: 1px dashed #007bff;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9fafb;
+}
+
+.job-section h2,
+.results-section h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.upload-box p {
+    margin: 0 0 20px;
+}
+
+.upload-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #job-description-input {
@@ -181,7 +207,7 @@ nav ul li a {
 
 .generate-button {
     background-color: #007bff;
-    color: white;
+    color: #fff;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -215,28 +241,129 @@ nav ul li a {
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: #fefefe;
     padding: 30px;
     border-radius: 15px;
-    width: 90%; /* Adjusted to 90% width for responsiveness */
-    max-width: 400px; /* Cap at a max width for desktops */
+    width: 100%; /* Ensure responsiveness */
+    max-width: 450px; /* Slightly increased to handle sign-up text */
     text-align: center;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
     position: relative;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-50px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+    opacity: 1;
 }
 
 .close-button {
     color: #aaa;
+    float: right;
     font-size: 24px;
     font-weight: bold;
     position: absolute;
     top: 15px;
     right: 20px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #000;
+    text-decoration: none;
     cursor: pointer;
 }
 
-.close-button:hover {
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.login-image {
+    margin-bottom: 20px;
+}
+
+.login-image img {
+    width: 80px;
+    height: auto;
+}
+
+.input-container {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-container input:focus {
+    border-color: #000;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn {
+    background-color: #000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.login-btn:hover {
+    background-color: #333;
+}
+
+.forgot-password {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.forgot-password a {
     color: #000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.social-login {
+    margin-top: 30px;
+}
+
+.social-login p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.google-sign-in-btn {
+    background-color: #db4437;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.google-sign-in-btn:hover {
+    background-color: #c23321;
 }
 
 /* Loader Styles */
@@ -263,27 +390,28 @@ nav ul li a {
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Remove dashed border when showing the job description box */
+.job-description-active .upload-box {
+    border: none;
 }
 
 /* Why Use Section */
 .why-use {
-    padding: 50px 20px;
+    padding: 30px 20px;
     text-align: center;
 }
 
 .why-use h2 {
-    font-size: 32px;
-    margin-bottom: 20px;
+    font-size: 28px;
+    margin-bottom: 15px;
 }
 
 .why-use p {
-    font-size: 18px;
+    font-size: 16px;
     margin-bottom: 30px;
 }
 
@@ -292,21 +420,24 @@ nav ul li a {
 .benefits {
     display: flex;
     justify-content: center;
+    gap: 3em;
     flex-wrap: wrap;
-    gap: 2em;
 }
 
 .feature,
 .benefit {
+    flex-grow: 1;
     max-width: 280px;
+    min-height: 200px; /* Set minimum height for consistency */
     text-align: left;
-    padding: 20px;
+    margin-bottom: 20px;
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
+    padding: 20px; /* Increased padding for better spacing */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 150px;
+    justify-content: space-between; /* Ensure content is evenly spaced */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for card effect */
 }
 
 .feature img,
@@ -325,13 +456,14 @@ nav ul li a {
 .feature p,
 .benefit p {
     font-size: 14px;
+    flex-grow: 1; /* Ensures text expands to take available space */
 }
 
 /* Call to Action Section */
 .cta {
     background-image: url('backdrop.jpg');
     background-size: cover;
-    color: white;
+    color: black;
     padding: 60px 20px;
     text-align: center;
 }
@@ -342,17 +474,13 @@ nav ul li a {
 }
 
 .cta-button {
-    background-color: #28a745;
+    background-color: #9391ea;
     color: white;
-    padding: 15px 25px;
+    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-}
-
-.cta-button:hover {
-    background-color: #218838;
+    font-size: 14px;
 }
 
 /* FAQ Section */
@@ -383,6 +511,7 @@ nav ul li a {
     cursor: pointer;
     padding: 10px;
     background-color: #fff;
+    text-align: center;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -399,22 +528,31 @@ nav ul li a {
     background-color: #fff;
 }
 
+.faq-answer p {
+    margin: 0;
+    font-size: 16px;
+}
+
 .faq-item.active .faq-answer {
     display: block;
+}
+
+.faq-item.active .faq-question {
+    background-color: #f1f1f1;
 }
 
 footer {
     padding: 20px 0;
     text-align: center;
-    background: #f8f9fa;
 }
 
 /* General Mobile Styles */
 @media (max-width: 768px) {
     body {
-        font-size: 14px;
+        font-size: 14px; /* Make font slightly smaller for mobile */
     }
 
+    /* Header */
     header {
         padding: 10px 0;
         border-bottom: 1px solid #ddd;
@@ -425,26 +563,28 @@ footer {
     }
 
     .auth-buttons button {
-        padding: 5px 10px;
-        font-size: 14px;
+        padding: 5px 10px; /* Smaller padding for buttons */
+        font-size: 14px; /* Adjust button font size */
     }
 
+    /* Hero Section */
     .hero-content {
-        flex-direction: column;
+        flex-direction: column; /* Stack items vertically */
         padding: 10px 20px;
     }
 
     .hero img {
-        max-width: 250px;
-        margin-bottom: 15px;
+        max-width: 250px; /* Smaller image */
+        margin-bottom: 15px; /* Adjust margin between image and text */
     }
 
     .hero-text {
-        text-align: center;
+        text-align: center; /* Center-align text for mobile */
     }
 
+    /* Progress Bar */
     .progress-bar {
-        flex-direction: column;
+        flex-direction: column; /* Stack the progress steps vertically */
         margin: 20px 0;
     }
 
@@ -455,43 +595,59 @@ footer {
 
     .upload-box {
         padding: 15px;
-        max-width: 90%;
+        max-width: 90%; /* Ensure the upload box takes up more space */
+    }
+
+    /* Modal Styles */
+    .modal {
+        justify-content: flex-start; /* Adjust modal to appear at the top */
+        padding-top: 50px;
     }
 
     .modal-content {
-        width: 90%;
-        padding: 20px;
+        width: 90%; /* Take more space on mobile */
+        padding: 20px; /* Adjust padding */
     }
 
     .modal-content h2 {
-        font-size: 20px;
+        font-size: 20px; /* Smaller title size */
     }
 
     .input-container input {
-        padding: 10px;
-        font-size: 14px;
+        padding: 10px; /* Adjust padding */
+        font-size: 14px; /* Smaller font for inputs */
     }
 
+    /* Login Button */
     .login-btn {
         padding: 10px;
         font-size: 14px;
     }
 
-    .faq {
+    .google-sign-in-btn {
         padding: 10px;
         font-size: 14px;
     }
 
+    /* FAQ Section */
+    .faq {
+        padding: 10px;
+        font-size: 14px; /* Reduce FAQ text size */
+    }
+
+    /* Call to Action Section */
     .cta {
         padding: 40px 20px;
+        text-align: center;
     }
 
     .cta h2 {
-        font-size: 28px;
+        font-size: 28px; /* Adjust header size */
     }
 
+    /* Why Use Section */
     .benefits {
-        flex-direction: column;
+        flex-direction: column; /* Stack benefits vertically */
         align-items: center;
     }
 
@@ -500,11 +656,13 @@ footer {
         max-width: 90%;
     }
 
+    /* Loader Styles */
     .loader .spinner {
-        width: 40px;
+        width: 40px; /* Smaller loader */
         height: 40px;
     }
 
+    /* Footer */
     footer {
         padding: 10px 0;
     }
@@ -517,12 +675,12 @@ footer {
     }
 
     .hero-content {
-        flex-direction: row;
+        flex-direction: row; /* Keep it in row for tablets */
         padding: 20px;
     }
 
     .hero img {
-        max-width: 300px;
+        max-width: 300px; /* Slightly smaller image */
     }
 
     .upload-box {
@@ -534,6 +692,7 @@ footer {
         padding: 30px;
     }
 
+    /* Call to Action Section */
     .cta h2 {
         font-size: 30px;
     }
@@ -546,6 +705,7 @@ footer {
         padding: 15px 0;
     }
 }
+
 
 #login-button, #signup-button {
     width: 100%;
