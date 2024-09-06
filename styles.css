@@ -5,7 +5,12 @@ body {
     padding: 0;
     -webkit-font-smoothing: antialiased; /* Mac OS font smoothing */
     -moz-osx-font-smoothing: grayscale;  /* Firefox on Mac OS */
-    font-smooth: always; /* Windows ClearType */
+    font-smooth: auto; /* Ensure Windows font clarity */
+    box-sizing: border-box;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit; /* Ensure consistent box model across elements */
 }
 
 header {
@@ -21,9 +26,6 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    display: -webkit-box; /* Older Safari */
-    display: -ms-flexbox; /* IE 10 */
-    display: flex;
 }
 
 .logo {
@@ -98,41 +100,38 @@ nav ul li a {
     width: 100%;
 }
 
-/* Progress Bar */
-.progress-bar {
+/* Features and Benefits */
+.features, .benefits {
     display: flex;
     justify-content: space-between;
-    margin: 20px 0;
+    flex-wrap: wrap;
+    padding: 40px 20px;
 }
 
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 33%;
+.feature, .benefit {
+    flex: 1 1 280px; /* Flexbox ensures responsiveness */
+    text-align: left;
+    margin: 10px;
+    padding: 15px;
+    border: 2px inset rgba(0, 0, 0, 0.088);
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
 }
 
-.step .circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #cccccc;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #ffffff;
-    font-size: 18px;
-    margin-bottom: 5px;
+.feature img, .benefit img {
+    width: 45px;
+    height: auto;
+    margin-bottom: 15px;
 }
 
-.step.active .circle {
-    background-color: #007bff;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+.feature h3, .benefit h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
 }
 
-.step .label {
+.feature p, .benefit p {
     font-size: 14px;
-    color: #333333;
 }
 
 /* Upload and Job Description Sections */
@@ -171,26 +170,6 @@ nav ul li a {
     background-color: #0056b3;
 }
 
-/* Input and Button Normalization for Cross-Browser Consistency */
-button, input, textarea {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    outline: none;
-    border-radius: 0; /* Optional for flat design consistency */
-}
-
-input, textarea {
-    padding: 12px 20px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-}
-
-button {
-    cursor: pointer;
-}
-
 #job-description-input {
     width: 100%;
     max-width: 600px;
@@ -202,6 +181,20 @@ button {
     margin-bottom: 20px;
     resize: none;
     outline: none;
+}
+
+.generate-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.generate-button:hover {
+    background-color: #0056b3;
 }
 
 /* Modal Dialog */
@@ -258,6 +251,16 @@ button {
     margin-bottom: 20px;
 }
 
+.cta-button {
+    background-color: #9391ea;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
     body {
@@ -266,6 +269,7 @@ button {
 
     .container {
         width: 95%;
+        flex-direction: column;
     }
 
     .hero-content {
@@ -282,14 +286,13 @@ button {
         text-align: center;
     }
 
-    .progress-bar {
+    .features, .benefits {
         flex-direction: column;
-        margin: 20px 0;
     }
 
-    .step {
-        width: 100%;
-        margin-bottom: 10px;
+    .feature, .benefit {
+        margin: 20px 0;
+        max-width: 100%;
     }
 
     .upload-box {
@@ -300,14 +303,6 @@ button {
     .modal-content {
         width: 90%;
         padding: 20px;
-    }
-
-    /* Adjustments for Retina Displays (Mac) */
-    @media only screen and (-webkit-min-device-pixel-ratio: 2),
-    only screen and (min-resolution: 192dpi) {
-        .hero img {
-            max-width: 500px;
-        }
     }
 }
 
