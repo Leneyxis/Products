@@ -3,9 +3,6 @@ body {
     font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 0;
-    -webkit-font-smoothing: antialiased; /* For better rendering on macOS */
-    -moz-osx-font-smoothing: grayscale; /* For better rendering on Firefox macOS */
-    font-smooth: auto; /* Ensure smooth font rendering on Windows */
 }
 
 header {
@@ -71,7 +68,6 @@ nav ul li a {
     padding: 40px 20px;
     background-image: url('backdrop.jpg');
     background-size: cover;
-    background-position: center;
 }
 
 .hero-content {
@@ -144,7 +140,7 @@ nav ul li a {
     border-radius: 8px;
     background-color: #f9fafb;
     max-width: 600px;
-    margin: 20px auto;
+    margin: 20px auto; /* Center the box on the page */
     text-align: center;
 }
 
@@ -181,6 +177,19 @@ nav ul li a {
 .results-section h2 {
     font-size: 18px;
     margin-bottom: 20px;
+}
+
+.upload-box p {
+    margin: 0 0 20px;
+}
+
+.upload-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 #job-description-input {
@@ -235,8 +244,8 @@ nav ul li a {
     background-color: #fefefe;
     padding: 30px;
     border-radius: 15px;
-    width: 100%;
-    max-width: 450px;
+    width: 100%; /* Ensure responsiveness */
+    max-width: 450px; /* Slightly increased to handle sign-up text */
     text-align: center;
     position: relative;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
@@ -250,13 +259,168 @@ nav ul li a {
     opacity: 1;
 }
 
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.login-image {
+    margin-bottom: 20px;
+}
+
+.login-image img {
+    width: 80px;
+    height: auto;
+}
+
+.input-container {
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-container input:focus {
+    border-color: #000;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.login-btn {
+    background-color: #000;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.login-btn:hover {
+    background-color: #333;
+}
+
+.forgot-password {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.forgot-password a {
+    color: #000;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.social-login {
+    margin-top: 30px;
+}
+
+.social-login p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+}
+
+.google-sign-in-btn {
+    background-color: #db4437;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.google-sign-in-btn:hover {
+    background-color: #c23321;
+}
+
+/* Loader Styles */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loader .spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #3498db;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Remove dashed border when showing the job description box */
+.job-description-active .upload-box {
+    border: none;
+}
+
+/* Why Use Section */
+.why-use {
+    padding: 30px 20px;
+    text-align: center;
+}
+
+.why-use h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.why-use p {
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
 /* Features and Benefits */
 .features,
 .benefits {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
-    padding: 20px 0;
 }
 
 .feature,
@@ -267,8 +431,6 @@ nav ul li a {
     border: 2px inset rgba(0, 0, 0, 0.088);
     border-radius: 10px;
     padding: 15px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
 }
 
 .feature img,
@@ -379,7 +541,7 @@ footer {
 /* General Mobile Styles */
 @media (max-width: 768px) {
     body {
-        font-size: 14px;
+        font-size: 14px; /* Make font slightly smaller for mobile */
     }
 
     /* Header */
@@ -393,28 +555,28 @@ footer {
     }
 
     .auth-buttons button {
-        padding: 5px 10px;
-        font-size: 14px;
+        padding: 5px 10px; /* Smaller padding for buttons */
+        font-size: 14px; /* Adjust button font size */
     }
 
     /* Hero Section */
     .hero-content {
-        flex-direction: column;
+        flex-direction: column; /* Stack items vertically */
         padding: 10px 20px;
     }
 
     .hero img {
-        max-width: 250px;
-        margin-bottom: 15px;
+        max-width: 250px; /* Smaller image */
+        margin-bottom: 15px; /* Adjust margin between image and text */
     }
 
     .hero-text {
-        text-align: center;
+        text-align: center; /* Center-align text for mobile */
     }
 
     /* Progress Bar */
     .progress-bar {
-        flex-direction: column;
+        flex-direction: column; /* Stack the progress steps vertically */
         margin: 20px 0;
     }
 
@@ -425,25 +587,36 @@ footer {
 
     .upload-box {
         padding: 15px;
-        max-width: 90%;
+        max-width: 90%; /* Ensure the upload box takes up more space */
     }
 
     /* Modal Styles */
     .modal {
-        justify-content: flex-start;
+        justify-content: flex-start; /* Adjust modal to appear at the top */
         padding-top: 50px;
     }
 
     .modal-content {
-        width: 90%;
-        padding: 20px;
+        width: 90%; /* Take more space on mobile */
+        padding: 20px; /* Adjust padding */
     }
 
     .modal-content h2 {
-        font-size: 20px;
+        font-size: 20px; /* Smaller title size */
     }
 
     .input-container input {
+        padding: 10px; /* Adjust padding */
+        font-size: 14px; /* Smaller font for inputs */
+    }
+
+    /* Login Button */
+    .login-btn {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .google-sign-in-btn {
         padding: 10px;
         font-size: 14px;
     }
@@ -451,7 +624,7 @@ footer {
     /* FAQ Section */
     .faq {
         padding: 10px;
-        font-size: 14px;
+        font-size: 14px; /* Reduce FAQ text size */
     }
 
     /* Call to Action Section */
@@ -461,11 +634,12 @@ footer {
     }
 
     .cta h2 {
-        font-size: 28px;
+        font-size: 28px; /* Adjust header size */
     }
 
+    /* Why Use Section */
     .benefits {
-        flex-direction: column;
+        flex-direction: column; /* Stack benefits vertically */
         align-items: center;
     }
 
@@ -476,7 +650,7 @@ footer {
 
     /* Loader Styles */
     .loader .spinner {
-        width: 40px;
+        width: 40px; /* Smaller loader */
         height: 40px;
     }
 
@@ -493,12 +667,12 @@ footer {
     }
 
     .hero-content {
-        flex-direction: row;
+        flex-direction: row; /* Keep it in row for tablets */
         padding: 20px;
     }
 
     .hero img {
-        max-width: 300px;
+        max-width: 300px; /* Slightly smaller image */
     }
 
     .upload-box {
@@ -523,6 +697,7 @@ footer {
         padding: 15px 0;
     }
 }
+
 
 #login-button, #signup-button {
     width: 100%;
