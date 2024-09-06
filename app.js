@@ -205,7 +205,7 @@ function toggleUI(isSignedIn) {
         signInButton.style.display = 'block'; // Show sign in button
         signOutButton.style.display = 'none';  // Hide sign out button
     }
-}
+
 
 // Ensure file selection triggers sign-in if the user is not logged in
 uploadButton.addEventListener('click', () => {
