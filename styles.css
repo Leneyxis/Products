@@ -97,6 +97,7 @@ nav ul li a {
     display: flex;
     justify-content: space-between;
     margin: 20px 0;
+    justify-content: center;
 }
 
 .step {
