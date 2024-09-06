@@ -505,3 +505,25 @@ document.querySelectorAll('.faq-question').forEach(question => {
         answer.style.display = isVisible ? 'none' : 'block';
     });
 });
+
+// Close login modal with Escape key and trigger login/sign-up with Enter key
+document.addEventListener('keydown', (event) => {
+    const isModalOpen = loginModal.style.display === 'flex';
+    
+    if (isModalOpen) {
+        if (event.key === 'Escape') {
+            loginModal.classList.remove('show');
+            setTimeout(() => {
+                loginModal.style.display = 'none';
+            }, 300);  // Wait for the transition to complete before hiding
+        }
+
+        if (event.key === 'Enter') {
+            if (isSignUpMode) {
+                signupButton.click();  // Trigger sign-up
+            } else {
+                loginButton.click();  // Trigger login
+            }
+        }
+    }
+});
